@@ -18,6 +18,15 @@ export default function TabLayout() {
           headerShadowVisible: false,
         }}
       />
+      <Tabs.Screen
+        name="mypage"
+        options={{
+          title: '마이페이지',
+          headerStyle: styles.header,
+          headerTitleStyle: styles.title,
+          headerShadowVisible: false,
+        }}
+      />
     </Tabs>
   );
 }
