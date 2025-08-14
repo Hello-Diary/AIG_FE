@@ -1,10 +1,10 @@
 import c from '@/src/constants/colors';
 import { StyleSheet, Text, View } from "react-native";
 
-export default function HomeScreen() {
+export default function DictionaryScreen() {
   return (
     <View style={styles.container}>
-      <Text>Home Screen</Text>
+      <Text>Dictionary Screen</Text>
     </View>
   );
 }
