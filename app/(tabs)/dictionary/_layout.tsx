@@ -12,6 +12,7 @@ export default function DictionaryLayout() {
           headerStyle: styles.header,
           headerTitleStyle: styles.title,
           headerShadowVisible: false,
+          headerBackVisible: true,
         }}
       />
       <Stack.Screen
