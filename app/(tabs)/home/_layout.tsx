@@ -1,6 +1,4 @@
-import c from '@/src/constants/colors';
 import { Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
 
 export default function HomeLayout() {
   return (
@@ -15,14 +13,3 @@ export default function HomeLayout() {
     </Stack>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: c.button,
-  },
-  title: {
-    color: c.gray2,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
