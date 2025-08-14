@@ -1,43 +1,30 @@
-import c from '@/src/constants/colors';
 import { Tabs } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import React from 'react';
 
 export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen
-        name="index"
-        options={{ headerShown: false }}
+        name="home"
+        options={{
+          title: '홈',
+          headerShown: false,
+        }}
       />
       <Tabs.Screen
         name="dictionary"
         options={{
           title: '나의 사전',
-          headerStyle: styles.header,
-          headerTitleStyle: styles.title,
-          headerShadowVisible: false,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="mypage"
         options={{
           title: '마이페이지',
-          headerStyle: styles.header,
-          headerTitleStyle: styles.title,
-          headerShadowVisible: false,
+          headerShown: false,
         }}
       />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: c.button,
-  },
-  title: {
-    color: c.gray2,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
