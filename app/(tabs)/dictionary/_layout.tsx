@@ -53,12 +53,12 @@ const styles = StyleSheet.create({
     backgroundColor: c.button,
   },
   title: {
-    color: c.gray2,
+    color: c.gray1,
     fontSize: 18,
     fontWeight: 'bold',
   },
   addButtonText: {
-    color: c.blue4,
+    color: c.primary,
     fontSize: 18,
     fontWeight: 'bold',
   },
