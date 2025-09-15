@@ -6,7 +6,7 @@ import c from '../constants/colors';
 export default function BackButton() {
   return (
     <Pressable onPress={() => router.back()}>
-      <Ionicons name="chevron-back" size={18} color={c.gray2} />
+      <Ionicons name="chevron-back" size={18} color={c.gray1} />
     </Pressable>
   );
 }
