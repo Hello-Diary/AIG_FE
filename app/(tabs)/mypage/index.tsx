@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Switch,
@@ -31,7 +30,7 @@ export default function MyPageScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
       {/* Profile Section */}
@@ -47,7 +46,7 @@ export default function MyPageScreen() {
         <Text style={styles.sectionTitle}>읽기 알림</Text>
         
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>읽기정성 알림</Text>
+          <Text style={styles.settingLabel}>읽기 작성 알림</Text>
           <Switch
             trackColor={{ false: '#E5E5E5', true: '#4A90E2' }}
             thumbColor="#FFFFFF"
@@ -111,7 +110,7 @@ export default function MyPageScreen() {
       >
         <Ionicons name="pencil" size={24} color="#FFFFFF" />
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }
 

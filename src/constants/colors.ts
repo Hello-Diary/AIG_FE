@@ -1,16 +1,18 @@
 const Colors = {
-  blue1: '#C4E4F0',
-  blue2: '#71BFDB',
+  // 피그마 색상 시스템 그대로 가져왔습니다!
+  primary: '#4052E2',
+  secondary: '#3589F8',
+  tertiary: '#EBF4FD',
+  quartenary: '#F2F6FC',
+
+  mainwhite: '#FFFFFF',
+  black: '#000000',
+  bluegray1: '#9199A6',
+  gray1: '#626262',
+  pink: '#FFE3E3',
+
+  bg: '#F9FBFF',
   button: '#D5D5D5',
-  blue4: '#258CB2',
-  gray2: '#626262',
-  green: '#19B053',
-  grayblue: '#4A5786',
-  bgup: '#CBE6F74D',
-  bgdown: '#628B9941',
-  bg: '#F6F6F6',
-  gradup: '#60BAF3',
-  graddown: '#73D7FA',
 };
 
 export default Colors;
