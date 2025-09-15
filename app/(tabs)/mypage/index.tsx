@@ -1,54 +1,49 @@
-import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import {
-  StatusBar,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import c from "@/src/constants/colors";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Image, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MyPageScreen() {
   const [isReadingReminderOn, setIsReadingReminderOn] = useState(true);
+  const [profileUrl, setProfileUrl] = useState<string | null>(null); // 프로필 이미지 URL 상태
 
   const toggleSwitch = () => setIsReadingReminderOn(!isReadingReminderOn);
 
   const handleLogout = () => {
     // 로그아웃 로직
-    console.log('로그아웃');
+    console.log("로그아웃");
   };
 
   const handleWithdraw = () => {
     // 탈퇴하기 로직
-    console.log('탈퇴하기');
+    console.log("탈퇴하기");
   };
 
   const handleEdit = () => {
     // 편집 로직
-    console.log('편집');
+    console.log("편집");
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-
+    <SafeAreaView style={styles.container}>
       {/* Profile Section */}
       <View style={styles.profileSection}>
-        <View style={styles.profileAvatar}>
-          <Ionicons name="person" size={24} color="#666" />
+        <View style={styles.profileImageContainer}>
+          <Image source={profileUrl ? { uri: profileUrl } : require('@/assets/images/default-profile.png')} style={styles.profileImage} />
         </View>
+
         <Text style={styles.profileName}>김한동 님</Text>
       </View>
 
       {/* Reading Reminder Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>읽기 알림</Text>
-        
+
         <View style={styles.settingItem}>
           <Text style={styles.settingLabel}>읽기 작성 알림</Text>
           <Switch
-            trackColor={{ false: '#E5E5E5', true: '#4A90E2' }}
+            trackColor={{ false: "#E5E5E5", true: "#4A90E2" }}
             thumbColor="#FFFFFF"
             ios_backgroundColor="#E5E5E5"
             onValueChange={toggleSwitch}
@@ -85,16 +80,16 @@ export default function MyPageScreen() {
 
       {/* Actions Section */}
       <View style={styles.actionsSection}>
-        <TouchableOpacity 
-          style={styles.actionItem} 
+        <TouchableOpacity
+          style={styles.actionItem}
           onPress={handleLogout}
           activeOpacity={0.7}
         >
           <Text style={styles.actionText}>로그아웃</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.actionItem} 
+        <TouchableOpacity
+          style={styles.actionItem}
           onPress={handleWithdraw}
           activeOpacity={0.7}
         >
@@ -103,75 +98,89 @@ export default function MyPageScreen() {
       </View>
 
       {/* Floating Edit Button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.floatingEditButton}
         onPress={handleEdit}
         activeOpacity={0.8}
       >
         <Ionicons name="pencil" size={24} color="#FFFFFF" />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    gap: 20,
+    paddingHorizontal: 20,
+    marginTop: 10,
+    backgroundColor: c.bg,
   },
   profileSection: {
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 27,
     paddingVertical: 30,
   },
-  profileAvatar: {
+  profileImageContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#F0F0F0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   profileName: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: c.black,
   },
   section: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
+    display: "flex",
+    flexDirection: "column",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#F4F4F4",
+    borderRadius: 8,
+    backgroundColor: c.mainwhite,
+    padding: 20,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 20,
   },
   editButton: {
     fontSize: 14,
-    color: '#4A90E2',
-    fontWeight: '500',
+    color: "#4A90E2",
+    fontWeight: "500",
   },
   settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 15,
   },
   settingLabel: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   settingValue: {
     fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
+    color: "#333",
+    fontWeight: "500",
   },
   switch: {
     transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
@@ -181,13 +190,13 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 4,
   },
   infoValue: {
     fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
+    color: "#333",
+    fontWeight: "500",
   },
   actionsSection: {
     paddingHorizontal: 20,
@@ -198,19 +207,19 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   floatingEditButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 50,
     right: 20,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#4A90E2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    backgroundColor: "#4A90E2",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
