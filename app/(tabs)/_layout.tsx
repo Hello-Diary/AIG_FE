@@ -4,15 +4,24 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Home'
+          title: 'Home',
+          headerShown: false,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="dictionary"
         options={{
-          title: 'Explore'
+          title: 'Dictionary',
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="mypage"
+        options={{
+          title: 'My Page',
+          headerShown: false,
         }}
       />
     </Tabs>
