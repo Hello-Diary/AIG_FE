@@ -1,8 +1,7 @@
 import BackButton from '@/src/components/BackButton';
-import c from '@/src/constants/colors';
 
-import { router, Stack } from 'expo-router';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Stack } from 'expo-router';
+import { StyleSheet } from 'react-native';
 
 export default function DictionaryLayout() {
   return (
@@ -11,22 +10,13 @@ export default function DictionaryLayout() {
         name="index"
         options={{
           title: '나의 사전',
-          headerStyle: styles.header,
-          headerTitleStyle: styles.title,
-          headerShadowVisible: false,
+          headerShown: false,
           headerLeft: () => (
             <BackButton />
           ),
-          headerRight: () => (
-            <Pressable
-              onPress={() => router.push('/dictionary/add')}
-            >
-              <Text style={styles.addButtonText}>단어 추가</Text>
-            </Pressable>
-          ),
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="add"
         options={{
           title: '단어 추가',
@@ -34,32 +24,10 @@ export default function DictionaryLayout() {
           headerTitleStyle: styles.title,
           headerShadowVisible: false,
         }}
-      />
-      <Stack.Screen
-        name="details"
-        options={{
-          title: '상세 페이지',
-          headerStyle: styles.header,
-          headerTitleStyle: styles.title,
-          headerShadowVisible: false,
-        }}
-      />
+      /> */}
     </Stack>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    backgroundColor: c.button,
-  },
-  title: {
-    color: c.gray1,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  addButtonText: {
-    color: c.primary,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
 });
