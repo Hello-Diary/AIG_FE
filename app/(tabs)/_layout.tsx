@@ -28,6 +28,10 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="diary"
+        options={{ href: null }}
+      />
     </Tabs>
   );
 }
