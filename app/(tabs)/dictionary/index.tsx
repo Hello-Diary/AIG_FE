@@ -2,7 +2,13 @@ import c from "@/src/constants/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { JSX, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface IdiomData {
@@ -130,30 +136,29 @@ export default function DictionaryScreen() {
               color="#666"
             />
           </View>
-        </TouchableOpacity>
+          {isExpanded && (
+            <View style={styles.expandedContent}>
+              <Text style={styles.koreanMeaning}>{idiom.korean}</Text>
+              <Text style={styles.example}>{idiom.example}</Text>
 
-        {isExpanded && (
-          <View style={styles.expandedContent}>
-            <Text style={styles.koreanMeaning}>{idiom.korean}</Text>
-            <Text style={styles.example}>{idiom.example}</Text>
+              <View style={styles.detailsBox}>
+                <Text style={styles.sectionTitle}>뉘앙스</Text>
+                {idiom.usage.map((usage, idx) => (
+                  <Text key={idx} style={styles.bulletPoint}>
+                    • {usage}
+                  </Text>
+                ))}
 
-            <View style={styles.detailsBox}>
-              <Text style={styles.sectionTitle}>뉘앙스</Text>
-              {idiom.usage.map((usage, idx) => (
-                <Text key={idx} style={styles.bulletPoint}>
-                  • {usage}
-                </Text>
-              ))}
-
-              <Text style={styles.sectionTitle}>자주 쓰는 조합</Text>
-              {idiom.variations.map((variation, idx) => (
-                <Text key={idx} style={styles.bulletPoint}>
-                  • {variation}
-                </Text>
-              ))}
+                <Text style={styles.sectionTitle}>자주 쓰는 조합</Text>
+                {idiom.variations.map((variation, idx) => (
+                  <Text key={idx} style={styles.bulletPoint}>
+                    • {variation}
+                  </Text>
+                ))}
+              </View>
             </View>
-          </View>
-        )}
+          )}
+        </TouchableOpacity>
       </View>
     );
   };
@@ -237,6 +242,8 @@ export default function DictionaryScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
     backgroundColor: c.bg || "#fff",
   },
@@ -246,8 +253,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
   },
   headerTitle: {
     fontSize: 18,
@@ -256,12 +261,28 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    height: '100%',
     paddingHorizontal: 20,
   },
+  horizontalLine: {
+    height: 1,
+    backgroundColor: '#E0E0E0',
+    width: '100%',
+  },
   idiomItem: {
-    paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    backgroundColor: c.mainwhite,
+    padding: 20,
+    marginVertical: 6,
+    shadowColor: "#E1E1E1",
+    shadowOffset: { width: 3, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
   },
   idiomHeader: {
     flexDirection: "row",
@@ -281,8 +302,15 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   expandedContent: {
+    width: '100%',
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 15,
     paddingTop: 15,
-    paddingLeft: 23,
+    borderTopColor: "#E0E0E0",
+    borderStyle: "solid",
+    borderTopWidth: 1,
   },
   koreanMeaning: {
     fontSize: 16,
@@ -292,11 +320,11 @@ const styles = StyleSheet.create({
   },
   example: {
     fontSize: 14,
-    color: "#666",
+    textAlign: "center",
     marginBottom: 15,
-    fontStyle: "italic",
   },
   detailsBox: {
+    width: "100%",
     backgroundColor: "#f8f9fa",
     padding: 15,
     borderRadius: 8,
@@ -319,7 +347,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 20,
     gap: 20,
   },
   pageNumber: {
