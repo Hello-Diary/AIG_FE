@@ -1,11 +1,19 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import Svg, { Path } from "react-native-svg";
 
-const Calendar = () => <Text style={styles.icon}>📅</Text>;
-const Search = () => <Text style={styles.icon}>🔍</Text>;
-const Plus = () => <Text style={styles.icon}>➕</Text>;
-const Home = () => <Text style={styles.icon}>🏠</Text>;
-const User = () => <Text style={styles.icon}>👤</Text>;
+const Search = () => (
+  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={styles.icons}>
+    <Path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#9199A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <Path d="M21 21L16.65 16.65" stroke="#9199A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </Svg>
+);
+const Plus = () => (
+  <Svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+    <Path d="M14 23.3326H24.5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M19.25 4.08394C19.7141 3.61981 20.3436 3.35907 21 3.35907C21.325 3.35907 21.6468 3.42308 21.9471 3.54746C22.2474 3.67183 22.5202 3.85413 22.75 4.08394C22.9798 4.31376 23.1621 4.58658 23.2865 4.88685C23.4109 5.18712 23.4749 5.50894 23.4749 5.83394C23.4749 6.15895 23.4109 6.48077 23.2865 6.78104C23.1621 7.0813 22.9798 7.35413 22.75 7.58394L8.16667 22.1673L3.5 23.3339L4.66667 18.6673L19.25 4.08394Z" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
 const ChevronLeft = () => <Text style={styles.icon}>‹</Text>;
 const ChevronRight = () => <Text style={styles.icon}>›</Text>;
 
@@ -91,7 +99,7 @@ export default function HomePage() {
           <TextInput 
             placeholder="search" 
             style={styles.searchInput}
-            placeholderTextColor="#666"
+            placeholderTextColor="#9199A6"
           />
           <View style={styles.searchIcon}>
             <Search />
@@ -158,25 +166,6 @@ export default function HomePage() {
             ))}
           </View>
         </View>
-      </View>
-
-      {/* Bottom navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-          <Home />
-          <Text style={[styles.navText, styles.activeNavText]}>홈</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.navItem}
-          onPress={() => setCurrentView('calendar')}
-        >
-          <Calendar />
-          <Text style={styles.navText}>나의시간</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <User />
-          <Text style={styles.navText}>마이</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Floating action button */}
@@ -268,25 +257,6 @@ export default function HomePage() {
           </View>
         </View>
 
-        {/* Bottom navigation */}
-        <View style={styles.bottomNav}>
-          <TouchableOpacity 
-            style={styles.navItem}
-            onPress={() => setCurrentView('home')}
-          >
-            <Home />
-            <Text style={styles.navText}>홈</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Calendar />
-            <Text style={[styles.navText, styles.activeNavText]}>나의시간</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <User />
-            <Text style={styles.navText}>마이</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Floating action button */}
         <TouchableOpacity style={styles.fab}>
           <Plus />
@@ -304,9 +274,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   header: {
-    backgroundColor: '#3b82f6',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: '#4052E2',
+    paddingHorizontal: 20,
+    paddingVertical: 50,
   },
   headerTop: {
     flexDirection: 'row',
@@ -315,8 +285,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   greeting: {
-    fontSize: 18,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '600',
     color: '#ffffff',
   },
   statusBar: {
@@ -338,33 +308,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 2,
   },
-  wifi: {
-    width: 16,
-    height: 8,
-    backgroundColor: '#ffffff',
-    borderRadius: 2,
-  },
-  battery: {
-    width: 24,
-    height: 12,
-    backgroundColor: '#ffffff',
-    borderRadius: 2,
-  },
   searchContainer: {
     position: 'relative',
   },
   searchInput: {
     backgroundColor: '#ffffff',
-    color: '#374151',
-    paddingHorizontal: 16,
+    color: '#000',
+    paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
-    fontSize: 16,
+    fontSize: 15,
+    height: 40,
   },
   searchIcon: {
     position: 'absolute',
-    right: 12,
-    top: 8,
+    right: 20,
+    top: "50%",
+    transform: [{ translateY: -12}],
+  },
+  icons: {
+    alignSelf: "center",
+    marginBottom: 100,
   },
   icon: {
     fontSize: 20,
@@ -394,7 +358,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   selectedDay: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#4052E2',
     borderRadius: 20,
     width: 32,
     height: 32,
@@ -416,7 +380,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   addButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#4052E2',
     padding: 8,
     borderRadius: 8,
   },
@@ -424,7 +388,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   todayTitle: {
-    color: '#3b82f6',
+    color: '#4052E2',
     fontWeight: '500',
     fontSize: 16,
   },
@@ -534,7 +498,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   selectedDayButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#4052E2',
   },
   dayButtonText: {
     color: '#374151',
@@ -575,16 +539,16 @@ const styles = StyleSheet.create({
     color: '#9ca3af',
   },
   activeNavText: {
-    color: '#3b82f6',
+    color: '#4052E2',
   },
   fab: {
     position: 'absolute',
     right: 16,
     bottom: 80,
-    backgroundColor: '#3b82f6',
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    backgroundColor: '#4052E2',
+    width: 52,
+    height: 52,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
