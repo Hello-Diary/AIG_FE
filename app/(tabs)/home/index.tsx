@@ -39,8 +39,10 @@ interface DiaryEntry {
 }
 
 export default function HomePage() {
-  const [currentView, setCurrentView] = useState<'home' | 'calendar'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'calendar' | 'search'>('home');
   const [currentDate, setCurrentDate] = useState<Date>(new Date(2025, 5, 14)); // June 14, 2025
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchTags, setSearchTags] = useState<string[]>([]);
   
   const monthNames: string[] = [
     'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
@@ -70,6 +72,30 @@ export default function HomePage() {
       time: ''
     }
   ];
+
+  const searchSuggestions = [
+    'missed', 'bus', 'sad', 'like', 'homework'
+  ];
+
+  const grammarSuggestions = [
+    { text: 'Have a blast', icon: '🔹' },
+    { text: 'Call it a day', icon: '🔹' }
+  ];
+
+  const previousSearches = [
+    { emoji: '🔥', title: 'I missed the bus', content: 'I missed the bus today and felt really sad. In t...' },
+    { emoji: '🔥', title: 'I missed the bus', content: 'I missed the bus today and felt really sad. In t...' }
+  ];
+
+  const removeSearchTag = (tagToRemove: string): void => {
+    setSearchTags(searchTags.filter(tag => tag !== tagToRemove));
+  };
+
+  const addSearchTag = (tag: string): void => {
+    if (!searchTags.includes(tag)) {
+      setSearchTags([...searchTags, tag]);
+    }
+  };
 
   const getDaysInMonth = (date: Date): (number | null)[] => {
     const year: number = date.getFullYear();
@@ -109,16 +135,17 @@ export default function HomePage() {
         </View>
         
         {/* Search bar */}
-        <View style={styles.searchContainer}>
-          <TextInput 
-            placeholder="search" 
-            style={styles.searchInput}
-            placeholderTextColor="#9199A6"
-          />
+        <TouchableOpacity 
+          style={styles.searchContainer}
+          onPress={() => setCurrentView('search')}
+        >
+          <View style={styles.searchInput}>
+            <Text style={styles.searchPlaceholder}>search</Text>
+          </View>
           <View style={styles.searchIcon}>
             <Search />
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Mini Calendar */}
@@ -186,6 +213,93 @@ export default function HomePage() {
       <TouchableOpacity style={styles.fab} onPress={() => router.push("/diary")}>
         <Plus />
       </TouchableOpacity>
+    </ScrollView>
+  );
+
+  const renderSearchView = () => (
+    <ScrollView style={styles.container}>
+      {/* Search Header */}
+      <View style={styles.searchHeader}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => setCurrentView('home')}
+        >
+          <ChevronLeft />
+        </TouchableOpacity>
+        <Text style={styles.searchHeaderTitle}>일기 검색</Text>
+        <View style={styles.placeholder} />
+      </View>
+
+      {/* Active Search Bar */}
+      <View style={styles.activeSearchContainer}>
+        <TextInput 
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="키워드를 영어로 검색하세요" 
+          style={styles.activeSearchInput}
+          placeholderTextColor="#9199A6"
+          autoFocus
+        />
+        <View style={styles.searchIcon}>
+          <Search />
+        </View>
+      </View>
+
+      {/* Search Tags */}
+      <View style={styles.searchTagsSection}>
+        <View style={styles.searchTagsHeader}>
+          <Text style={styles.sectionTitle}>최근 검색어</Text>
+          <TouchableOpacity>
+            <Text style={styles.clearAllButton}>모두 지우기</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.tagsGrid}>
+          {searchSuggestions.map((tag: string, index: number) => (
+            <View key={index} style={styles.searchTagRow}>
+              <Text style={styles.searchTagText}>{tag}</Text>
+              <TouchableOpacity 
+                style={styles.removeTagButton}
+                onPress={() => removeSearchTag(tag)}
+              >
+                <Text style={styles.removeTagText}>X</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Grammar Suggestions */}
+      <View style={styles.grammarSection}>
+        <Text style={styles.sectionTitle2}>검색결과</Text>
+        <Text style={styles.sectionSubTitle}>나의 사전에서 찾은 결과</Text>
+        <View style={styles.grammarList}>
+          {grammarSuggestions.map((item, index: number) => (
+            <TouchableOpacity key={index} style={styles.grammarItem}>
+              <Text style={styles.grammarIcon}>{item.icon}</Text>
+              <Text style={styles.grammarText}>{item.text}</Text>
+              <Text style={styles.grammarArrow}>›</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* Previous Searches */}
+      <View style={styles.previousSearchSection}>
+        <Text style={styles.sectionSubTitle}>일기에서 찾은 결과</Text>
+        <View style={styles.entriesList}>
+          {previousSearches.map((entry, index: number) => (
+            <View key={index} style={styles.searchEntryItem}>
+              <View style={styles.entryContent}>
+                <Text style={styles.entryEmoji}>{entry.emoji}</Text>
+                <View style={styles.entryTextContainer}>
+                  <Text style={styles.entryTitle}>{entry.title}</Text>
+                  <Text style={styles.entryText}>{entry.content}</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
     </ScrollView>
   );
 
@@ -279,7 +393,9 @@ export default function HomePage() {
     );
   };
 
-  return currentView === 'home' ? renderHomeView() : renderCalendarView();
+  return currentView === 'home' ? renderHomeView() : 
+         currentView === 'calendar' ? renderCalendarView() : 
+         renderSearchView();
 }
 
 const styles = StyleSheet.create({
@@ -333,6 +449,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     fontSize: 15,
     height: 40,
+    justifyContent: 'center',
+  },
+  searchPlaceholder: {
+    color: '#9199A6',
+    fontSize: 15,
   },
   searchIcon: {
     position: 'absolute',
@@ -572,5 +693,138 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  // Search Screen Styles
+  searchHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: '#4052E2',
+    paddingTop: 50,
+  },
+  backButton: {
+    padding: 4,
+  },
+  searchHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#ffffff',
+    flex: 1,
+    textAlign: 'center',
+    marginHorizontal: 16,
+  },
+  clearAllButton: {
+    color: '#B4B4B4',
+    fontSize: 10,
+    fontWeight: 600,
+  },
+  activeSearchContainer: {
+    position: 'relative',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: '#4052E2',
+  },
+  activeSearchInput: {
+    backgroundColor: '#ffffff',
+    color: '#000',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    fontSize: 15,
+    height: 40,
+  },
+  searchTagsSection: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  searchTagsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#777',
+  },
+  sectionTitle2: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#000',
+  },
+  sectionSubTitle: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#626262',
+  },
+  tagsGrid: {
+    gap: 12,
+  },
+  searchTagRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#D4D4D4',
+  },
+  searchTagText: {
+    color: '#777',
+    fontSize: 13,
+    fontWeight: 400,
+  },
+  removeTagButton: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeTagText: {
+    color: '#777',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  grammarSection: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  grammarList: {
+    gap: 12,
+  },
+  grammarItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    gap: 12,
+  },
+  grammarIcon: {
+    fontSize: 16,
+    color: '#4052E2',
+  },
+  grammarText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#374151',
+  },
+  grammarArrow: {
+    fontSize: 18,
+    color: '#9ca3af',
+  },
+  previousSearchSection: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+  },
+  searchEntryItem: {
+    backgroundColor: '#f9fafb',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
   },
 });
