@@ -2,10 +2,10 @@ import c from "@/src/constants/colors";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function FeedbackScreen() {
+export default function DiaryScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Feedback Page</Text>
+      <Text>Diary Write Page</Text>
     </SafeAreaView>
   );
 }

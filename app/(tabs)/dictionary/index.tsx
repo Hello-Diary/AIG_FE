@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 6,
     shadowColor: "#E1E1E1",
-    shadowOffset: { width: 3, height: 4 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 5,
@@ -297,6 +297,7 @@ const styles = StyleSheet.create({
   },
   idiomText: {
     flex: 1,
+    textAlign: "center",
     fontSize: 16,
     color: "#000",
     fontWeight: "400",
