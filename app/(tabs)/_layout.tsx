@@ -30,7 +30,10 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="diary"
-        options={{ href: null }}
+        options={{
+          href: null,
+          headerShown: false,
+        }}
       />
     </Tabs>
   );
