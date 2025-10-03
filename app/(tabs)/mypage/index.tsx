@@ -1,14 +1,19 @@
+import PlusButton from "@/src/components/PlusButton";
+import Reminder from "@/src/components/Reminder";
 import c from "@/src/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Image, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MyPageScreen() {
-  const [isReadingReminderOn, setIsReadingReminderOn] = useState(true);
   const [profileUrl, setProfileUrl] = useState<string | null>(null); // 프로필 이미지 URL 상태
-
-  const toggleSwitch = () => setIsReadingReminderOn(!isReadingReminderOn);
 
   const handleLogout = () => {
     // 로그아웃 로직
@@ -30,40 +35,30 @@ export default function MyPageScreen() {
       {/* Profile Section */}
       <View style={styles.profileSection}>
         <View style={styles.profileImageContainer}>
-          <Image source={profileUrl ? { uri: profileUrl } : require('@/assets/images/default-profile.png')} style={styles.profileImage} />
+          <Image
+            source={
+              profileUrl
+                ? { uri: profileUrl }
+                : require("@/assets/images/default-profile.png")
+            }
+            style={styles.profileImage}
+          />
         </View>
 
         <Text style={styles.profileName}>김한동 님</Text>
       </View>
 
       {/* Reading Reminder Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>읽기 알림</Text>
-
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>읽기 작성 알림</Text>
-          <Switch
-            trackColor={{ false: "#E5E5E5", true: "#4A90E2" }}
-            thumbColor="#FFFFFF"
-            ios_backgroundColor="#E5E5E5"
-            onValueChange={toggleSwitch}
-            value={isReadingReminderOn}
-            style={styles.switch}
-          />
-        </View>
-
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>알림시간</Text>
-          <Text style={styles.settingValue}>21:00</Text>
-        </View>
-      </View>
+      <Reminder />
 
       {/* Account Info Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>계정정보</Text>
           <TouchableOpacity onPress={handleEdit} activeOpacity={0.7}>
-            <Text style={styles.editButton}>편집</Text>
+            <View style={styles.editButton}>
+              <Ionicons name="settings-outline" size={20} color={c.gray2} />
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -97,14 +92,8 @@ export default function MyPageScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Floating Edit Button */}
-      <TouchableOpacity
-        style={styles.floatingEditButton}
-        onPress={handleEdit}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="pencil" size={24} color="#FFFFFF" />
-      </TouchableOpacity>
+      {/* Floating edit button */}
+      <PlusButton />
     </SafeAreaView>
   );
 }
@@ -131,9 +120,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   profileImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   profileName: {
     fontSize: 18,
@@ -149,41 +138,26 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: c.mainwhite,
     padding: 20,
+    shadowColor: "#E1E1E1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
   },
   sectionHeader: {
+    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
+    color: c.gray1,
     marginBottom: 20,
   },
   editButton: {
-    fontSize: 14,
-    color: "#4A90E2",
-    fontWeight: "500",
-  },
-  settingItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 15,
-  },
-  settingLabel: {
-    fontSize: 16,
-    color: "#333",
-  },
-  settingValue: {
-    fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
-  },
-  switch: {
-    transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+    height: 20,
   },
   infoItem: {
     paddingVertical: 12,

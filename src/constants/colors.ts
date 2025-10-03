@@ -11,6 +11,7 @@ const Colors = {
   black: '#000000',
   bluegray1: '#9199A6',
   gray1: '#626262',
+  gray2: '#A8A8A8',
   pink: '#FFE3E3',
 
   // 컴포넌트 색상
