@@ -3,12 +3,12 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
 import React, { useState } from "react";
 import {
-    Platform,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Platform,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function Reminder() {
@@ -33,6 +33,7 @@ export default function Reminder() {
 
   // 시간 선택 시
   const onChangeTime = (event: any, selectedDate?: Date) => {
+    setShowPicker(false);
     if (Platform.OS === "android") setShowPicker(false); // 안드로이드에서는 선택 후 닫기
     if (selectedDate) {
       setReminderTime(selectedDate);
@@ -40,8 +41,6 @@ export default function Reminder() {
         cancelNotification();
         scheduleNotification(selectedDate);
       }
-    } else {
-      setShowPicker(false); // 선택 취소 시 닫기
     }
   };
 
@@ -84,20 +83,22 @@ export default function Reminder() {
           onPress={() => setShowPicker(true)}
           disabled={!isReadingReminderOn}
         >
-          <Text
-            style={[
-              styles.settingValue,
-              !isReadingReminderOn && { color: c.gray2 },
-            ]}
-          >
-            {reminderTime.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </Text>
+          {(!isReadingReminderOn || !showPicker) && (
+            <Text
+              style={[
+                styles.settingValue,
+                !isReadingReminderOn && { color: c.gray2 },
+              ]}
+            >
+              {reminderTime.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </Text>
+          )}
         </TouchableOpacity>
 
-        {showPicker && isReadingReminderOn && (
+        {(showPicker && isReadingReminderOn) && (
           <DateTimePicker
             value={reminderTime}
             mode="time"

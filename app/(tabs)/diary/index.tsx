@@ -1,7 +1,7 @@
-import c from "@/src/constants/colors";
-import { StyleSheet, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React from 'react';
+import DiaryScreen from './writeDiary';
 
+<<<<<<< HEAD
 export default function DiaryScreen() {
   return (
     <SafeAreaView style={styles.container}>
@@ -19,3 +19,8 @@ const styles = StyleSheet.create({
     backgroundColor: c.bg,
   },
 });
+=======
+export default function DiaryPage() {
+  return <DiaryScreen />;
+}
+>>>>>>> f28377c6f5e7d039e34d0ae9be8e2effb78810a6
