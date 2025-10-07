@@ -9,6 +9,8 @@ import {
   Keyboard,
   Modal,
   Platform,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path, G, ClipPath, Defs, Rect } from "react-native-svg";
@@ -17,6 +19,11 @@ import Imoticon from '../../../assets/images/imoticon_btn.svg';
 import RefreshIcon from '../../../assets/images/refresh.svg';
 import ChevronDownIcon from '../../../assets/images/ChevronDownIcon.svg';
 import XIcon from '../../../assets/images/X_btn.svg';
+
+import DictionaryBottomSheet from './MyDictionary';
+import RewriteModal from './RewriteModal';
+import SaveModal from './SaveModal';
+import DeleteModal from './DeleteModal';
 
 const c = {
   bg: '#FFFFFF',
@@ -28,6 +35,7 @@ const c = {
   link: '#4052E2',
   buttonActive: '#4052E2',
   blue: '#5856D6',
+  red: '#E74C3C',
 };
 
 const topicSuggestions = [
@@ -38,18 +46,27 @@ const topicSuggestions = [
   'What do you hope to achieve tomorrow?',
 ];
 
+const { width } = Dimensions.get('window');
+
 export default function Diary() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedEmoji, setSelectedEmoji] = useState('');
   const [topicQuestion, setTopicQuestion] = useState('');
   const [isPickerVisible, setPickerVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isRewriteModalVisible, setIsRewriteModalVisible] = useState(false);
+  const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const emojiInputRef = useRef<TextInput>(null);
+  const slideAnim = useRef(new Animated.Value(280)).current;
 
-  const [date, setDate] = useState(new Date('2025-09-30')); // Updated to today's date
-  const [tempDate, setTempDate] = useState(new Date('2025-09-30')); // Updated to today's date
+  const [date, setDate] = useState(new Date('2025-09-30'));
+  const [tempDate, setTempDate] = useState(new Date('2025-09-30'));
 
   const isButtonEnabled = title.trim() !== '' && description.trim() !== '';
+
+  const [isDictionaryVisible, setDictionaryVisible] = useState(false); 
 
   const handleSubmit = () => {
     if (!isButtonEnabled) return;
@@ -99,6 +116,59 @@ export default function Diary() {
     return `${year}.${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`;
   };
 
+  const toggleMenu = () => {
+    const toValue = isMenuOpen ? 280 : 0;
+    Animated.timing(slideAnim, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleMenuAction = (action: string) => {
+    if (action === 'delete') {
+      setIsDeleteModalVisible(true);
+      toggleMenu();
+    } else if (action === 'save') {
+      setIsSaveModalVisible(true);
+      toggleMenu();
+    } else if (action === 'rewrite') {
+      setIsRewriteModalVisible(true);
+      toggleMenu();
+    }
+  };
+
+  const handleRewriteConfirm = () => {
+    console.log('Diary deleted');
+    setIsRewriteModalVisible(false);
+    // 다시 쓰는 로직
+  };
+
+  const handleRewriteCancel = () => {
+    setIsRewriteModalVisible(false);
+  };
+
+  const handleSaveConfirm = () => {
+    console.log('Diary saved');
+    setIsSaveModalVisible(false);
+    // 저장 후 main으로 가는 로직
+  };
+
+  const handleSaveCancel = () => {
+    setIsSaveModalVisible(false);
+  };
+
+  const handleDeleteConfirm = () => {
+    console.log('Diary deleted');
+    setIsDeleteModalVisible(false);
+    // 삭제 후 이전 화면으로 이동하는 로직 추가
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalVisible(false);
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <Modal
@@ -129,6 +199,62 @@ export default function Diary() {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      <RewriteModal
+        visible={isRewriteModalVisible}
+        onConfirm={handleRewriteConfirm}
+        onCancel={handleRewriteCancel}
+      />
+
+      <SaveModal
+        visible={isSaveModalVisible}
+        onConfirm={handleSaveConfirm}
+        onCancel={handleSaveCancel}
+      />
+
+      <DeleteModal
+        visible={isDeleteModalVisible}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
+
+      {/* Menu Overlay */}
+      {isMenuOpen && (
+        <TouchableOpacity 
+          style={styles.menuOverlay} 
+          activeOpacity={1} 
+          onPress={toggleMenu}
+        />
+      )}
+
+      {/* Side Menu */}
+      <Animated.View style={[styles.sideMenu, { transform: [{ translateX: slideAnim }] }]}>
+        <View style={styles.menuContent}>
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => handleMenuAction('rewrite')}
+          >
+            <Text style={styles.menuItemText}>처음부터 다시 쓰기</Text>
+          </TouchableOpacity>
+          <View style={styles.menuDivider} />
+
+          <TouchableOpacity 
+            style={styles.menuItem}
+            onPress={() => handleMenuAction('save')}
+          >
+            <Text style={styles.menuItemText}>임시저장하고 나가기</Text>
+          </TouchableOpacity>
+          <View style={styles.menuDivider} />
+
+          <TouchableOpacity 
+            style={[styles.menuItem, styles.menuItemDelete]}
+            onPress={() => handleMenuAction('delete')}
+          >
+            <Text style={[styles.menuItemText, styles.menuItemDeleteText]}>삭제하기</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+
       <TextInput
         ref={emojiInputRef}
         style={styles.hiddenInput}
@@ -136,6 +262,12 @@ export default function Diary() {
         onChangeText={handleEmojiInput}
         maxLength={4}
       />
+
+      <DictionaryBottomSheet 
+        visible={isDictionaryVisible}
+        onClose={() => setDictionaryVisible(false)}
+      />
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -164,7 +296,7 @@ export default function Diary() {
             <Text style={styles.dateText}>{formatDate(date)}</Text>
             <ChevronDownIcon style={{ marginLeft: 6 }} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.moreButton}>
+          <TouchableOpacity style={styles.moreButton} onPress={toggleMenu}>
             <Svg width="17" height="17" viewBox="0 0 17 17" fill="none">
               <Path
                 d="M8.89209 9.28748C9.26525 9.28748 9.56775 8.98497 9.56775 8.61182C9.56775 8.23866 9.26525 7.93616 8.89209 7.93616C8.51893 7.93616 8.21643 8.23866 8.21643 8.61182C8.21643 8.98497 8.51893 9.28748 8.89209 9.28748Z"
@@ -190,6 +322,7 @@ export default function Diary() {
             </Svg>
           </TouchableOpacity>
         </View>
+
         <View style={styles.card}>
           <View style={styles.titleContainer}>
             <TextInput
@@ -225,6 +358,7 @@ export default function Diary() {
             textAlignVertical="top"
           />
         </View>
+
         <TouchableOpacity style={styles.infoContainer} onPress={handleDrawTopic}>
           {topicQuestion ? (
             <>
@@ -242,6 +376,7 @@ export default function Diary() {
             </>
           )}
         </TouchableOpacity>
+
         {topicQuestion ? (
           <View style={styles.topicCard}>
             <Text style={styles.topicCardText}>{topicQuestion}</Text>
@@ -250,6 +385,7 @@ export default function Diary() {
             </TouchableOpacity>
           </View>
         ) : null}
+
         <TouchableOpacity
           style={[styles.submitButton, isButtonEnabled && styles.submitButtonActive]}
           onPress={handleSubmit}
@@ -258,7 +394,10 @@ export default function Diary() {
           <Text style={styles.submitButtonText}>피드백 받기</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.linkContainer}>
+        <TouchableOpacity 
+          style={styles.linkContainer}
+          onPress={() => setDictionaryVisible(true)}
+        >
           <Text style={styles.linkText}>나의 사전 열기</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -268,64 +407,103 @@ export default function Diary() {
 
 const styles = StyleSheet.create({
   hiddenInput: { position: 'absolute', top: -100, left: 0, height: 0, width: 0, opacity: 0 },
-  container: { flex: 1, backgroundColor: c.bg},
+  container: { flex: 1, backgroundColor: c.bg },
   scrollView: { flex: 1 },
   scrollContent: { paddingHorizontal: 20, paddingTop: 50, paddingBottom: 20 },
+  
+  // Menu Styles
+  menuOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    zIndex: 998,
+  },
+  sideMenu: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 280,
+    height: '100%',
+    backgroundColor: c.bg,
+    zIndex: 999,
+    shadowColor: '#000',
+    shadowOffset: { width: -2, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  menuContent: {
+    paddingTop: 60,
+  },
+  menuTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: c.text,
+    padding: 20,
+    textAlign: 'center',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#E5E5E5',
+  },
+  menuItem: {
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: c.text,
+    fontWeight: '600',
+  },
+  menuItemDelete: {
+    backgroundColor: 'transparent',
+  },
+  menuItemDeleteText: {
+    color: c.red,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  // Header
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
   backButton: { padding: 8 },
   moreButton: { padding: 8 },
   dateContainer: { flexDirection: 'row', alignItems: 'center' },
   dateText: { fontSize: 16, color: c.text, fontWeight: '500' },
-  card: { backgroundColor:'rgba(255, 255, 255, 0.60)', borderRadius: 12, borderWidth: 1, borderColor: c.border, padding: 16, marginBottom: 20, height: 350 },
+
+  // Card
+  card: { backgroundColor: 'rgba(255, 255, 255, 0.60)', borderRadius: 12, borderWidth: 1, borderColor: c.border, padding: 16, marginBottom: 20, height: 350 },
   titleContainer: { flexDirection: 'row', alignItems: 'center', paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: c.border, marginBottom: 12 },
   titleInput: { flex: 1, fontSize: 15, color: c.text, padding: 0, textAlign: 'center' },
   editIcon: { padding: 8 },
   imageButton: { width: 32, height: 32, borderRadius: 6.759, backgroundColor: '#DEDEDE', alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
   emojiText: { fontSize: 20 },
   descriptionInput: { flex: 1, fontSize: 13, color: c.text, lineHeight: 20 },
+
+  // Info
   infoContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   infoText: { fontSize: 13, color: c.alertText, textDecorationLine: 'underline' },
-  alertIconContainer: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: c.alertText,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  alertIconText: {
-    color: c.bg,
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  topicCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: c.border,
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    backgroundColor: '#FAFAFA',
-  },
-  topicCardText: {
-    flex: 1,
-    fontSize: 14,
-    color: c.text,
-    textAlign: 'left',
-    lineHeight: 20,
-    marginRight: 8,
-  },
-  topicCardCloseButton: {
-    padding: 4,
-  },
+  alertIconContainer: { width: 16, height: 16, borderRadius: 8, backgroundColor: c.alertText, justifyContent: 'center', alignItems: 'center', marginRight: 8 },
+  alertIconText: { color: c.bg, fontWeight: 'bold', fontSize: 12 },
+
+  // Topic Card
+  topicCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: c.border, borderRadius: 8, padding: 16, marginBottom: 16, backgroundColor: '#FAFAFA' },
+  topicCardText: { flex: 1, fontSize: 14, color: c.text, textAlign: 'left', lineHeight: 20, marginRight: 8 },
+  topicCardCloseButton: { padding: 4 },
+
+  // Button
   submitButton: { backgroundColor: c.button, borderRadius: 10, paddingVertical: 20, alignItems: 'center', marginTop: 100, marginBottom: 16 },
   submitButtonActive: { backgroundColor: c.buttonActive },
   submitButtonText: { fontSize: 20, fontWeight: '600', color: c.bg },
+
+  // Link
   linkContainer: { alignItems: 'center', paddingVertical: 8 },
   linkText: { fontSize: 14, color: c.link, textDecorationLine: 'underline' },
+
+  // Modal
   modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
   modalContent: { alignItems: 'center', backgroundColor: 'white', borderTopLeftRadius: 12, borderTopRightRadius: 12, padding: 16 },
   modalTitle: { fontSize: 18, fontWeight: '600', textAlign: 'center', marginBottom: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#EFEFEF' },
