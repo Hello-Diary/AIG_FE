@@ -201,14 +201,14 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     borderRadius: 8,
-    backgroundColor: "#F9FBFF",
+    backgroundColor: c.lightblue,
     padding: 20,
+    gap: 20,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
     color: "#333",
-    marginBottom: 20,
   },
   settingLabel: {
     fontSize: 16,
@@ -223,7 +223,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 15,
   },
   switch: {
     transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],

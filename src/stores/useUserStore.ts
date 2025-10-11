@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 type UserState = {
   userId: string;
@@ -15,10 +15,10 @@ type UserState = {
 };
 
 export const useUserStore = create<UserState>((set) => ({
-  userId: "",
-  email: "",
-  name: "",
-  role: "",
+  userId: '',
+  email: '',
+  name: '',
+  role: '',
   createdAt: new Date(),
 
   setUserId: (userId: string) => set({ userId }),
