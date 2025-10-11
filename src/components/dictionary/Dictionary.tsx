@@ -130,9 +130,11 @@ export default function Dictionary() {
     );
   };
 
-  // mock data 반복 - id 중복으로 인해 same key ERROR 발생함
   // TODO: API 명세 완료되면 데이터 받아오는 걸로 교체
-  const displayData = idiomData.concat(idiomData).concat(idiomData);
+  const displayData = idiomData;
+  
+  // mock data 반복 - id 중복으로 인해 same key ERROR 발생함
+  // const displayData = idiomData.concat(idiomData).concat(idiomData);
 
   return (
     <View style={styles.container}>
