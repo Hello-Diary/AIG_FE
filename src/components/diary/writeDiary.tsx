@@ -1,29 +1,29 @@
-import React, { useState, useRef } from 'react';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import React, { useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
+  Animated,
+  Dimensions,
   Keyboard,
   Modal,
   Platform,
-  Animated,
-  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, G, ClipPath, Defs, Rect } from "react-native-svg";
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import Svg, { ClipPath, Defs, G, Path, Rect } from "react-native-svg";
+import ChevronDownIcon from '../../../assets/images/ChevronDownIcon.svg';
 import Imoticon from '../../../assets/images/imoticon_btn.svg';
 import RefreshIcon from '../../../assets/images/refresh.svg';
-import ChevronDownIcon from '../../../assets/images/ChevronDownIcon.svg';
 import XIcon from '../../../assets/images/X_btn.svg';
 
-import DictionaryBottomSheet from './MyDictionary';
+import DeleteModal from '../../../src/components/diary/DeleteModal';
+import DictionaryBottomSheet from './DictionaryBottomSheet';
 import RewriteModal from './RewriteModal';
 import SaveModal from './SaveModal';
-import DeleteModal from '../../../src/components/diary/DeleteModal';
 
 const c = {
   bg: '#FFFFFF',

@@ -1,5 +1,5 @@
-import BackButton from "@/src/components/buttons/BackButton";
-import Dictionary from "@/src/components/Dictionary";
+import BackButton from "@/src/components/common/BackButton";
+import Dictionary from "@/src/components/dictionary/Dictionary";
 import c from "@/src/constants/colors";
 import {
   StyleSheet,
@@ -17,7 +17,10 @@ export default function DictionaryScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <Dictionary />
+      <Dictionary
+        visible={true}
+        onClose={() => {}}
+      />
     </SafeAreaView>
   );
 }
