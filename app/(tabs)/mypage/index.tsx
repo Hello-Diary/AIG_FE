@@ -43,7 +43,10 @@ export default function MyPageScreen() {
       </View>
 
       {/* Reading Reminder Section */}
-      <Reminder />
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>읽기 알림</Text>
+        <Reminder />
+      </View>
 
       {/* Account Info Section */}
       <View style={styles.section}>

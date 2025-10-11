@@ -88,8 +88,6 @@ export default function Reminder() {
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>읽기 알림</Text>
-
       <View style={styles.settingItem}>
         <Text style={styles.settingLabel}>읽기 작성 알림</Text>
         <Switch
@@ -202,17 +200,9 @@ const styles = StyleSheet.create({
   section: {
     display: "flex",
     flexDirection: "column",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: "#F4F4F4",
     borderRadius: 8,
-    backgroundColor: c.mainwhite,
+    backgroundColor: "#F9FBFF",
     padding: 20,
-    shadowColor: "#E1E1E1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 5,
   },
   sectionTitle: {
     fontSize: 16,
