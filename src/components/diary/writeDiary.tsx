@@ -23,7 +23,7 @@ import XIcon from '../../../assets/images/X_btn.svg';
 import DictionaryBottomSheet from './MyDictionary';
 import RewriteModal from './RewriteModal';
 import SaveModal from './SaveModal';
-import DeleteModal from './DeleteModal';
+import DeleteModal from '../../../src/components/diary/DeleteModal';
 
 const c = {
   bg: '#FFFFFF',
