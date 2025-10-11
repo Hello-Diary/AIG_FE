@@ -1,5 +1,5 @@
-import HomeButton from "@/src/components/buttons/HomeButton";
-import MoreButton from "@/src/components/buttons/MoreButton";
+import HomeButton from "@/src/components/common/HomeButton";
+import MoreButton from "@/src/components/common/MoreButton";
 import c from "@/src/constants/colors";
 import React, { useState } from "react";
 import {

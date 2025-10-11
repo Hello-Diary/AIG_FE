@@ -1,14 +1,14 @@
 import c from "@/src/constants/colors";
+import { IdiomData } from "@/src/types/dictionary";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { JSX, useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { IdiomData } from "../types/dictionary";
 
 export default function Dictionary() {
   // mock data
@@ -154,6 +154,7 @@ export default function Dictionary() {
   };
 
   const displayData = getDisplayData();
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -317,6 +318,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    margin: 10,
     gap: 20,
   },
   pageNumber: {
