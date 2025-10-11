@@ -25,7 +25,7 @@ Notifications.setNotificationHandler({
 export default function Reminder() {
   const [showPicker, setShowPicker] = useState(false);
   const [reminderTime, setReminderTime] = useState<Date>(new Date());
-  const [isReadingReminderOn, setIsReadingReminderOn] = useState(true);
+  const [isReadingReminderOn, setIsReadingReminderOn] = useState(false);
 
   const REMINDER_ID = "reading-reminder";
 

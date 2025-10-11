@@ -4,7 +4,14 @@ import c from "@/src/constants/colors";
 import { useUserStore } from "@/src/stores/useUserStore";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MyPageScreen() {
@@ -12,10 +19,28 @@ export default function MyPageScreen() {
   const { userId, email, name, role, createdAt } = useUserStore();
 
   // 사용자 정보 수정 시 사용하는 상태
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [newName, setNewName] = useState<string>(name);
 
   // 임시 프로필 이미지 URL 상태
   const [profileUrl, setProfileUrl] = useState<string | null>(null);
+
+  const handleEdit = () => {
+    setIsEditing(!isEditing);
+    setNewName(name);
+  };
+
+  // 여기에 async await 추가 & postUserData 함수 호출
+  const handleSubmit = () => {
+    // API 호출
+    const response = { data: { name: "유민" } };
+    const updatedUser = response.data;
+
+    useUserStore.getState().setName(updatedUser.name);
+
+    // 편집 모드 종료
+    setIsEditing(false);
+  };
 
   const handleLogout = () => {
     // 로그아웃 로직
@@ -25,11 +50,6 @@ export default function MyPageScreen() {
   const handleWithdraw = () => {
     // 탈퇴하기 로직
     console.log("탈퇴하기");
-  };
-
-  const handleEdit = () => {
-    // 편집 로직
-    console.log("편집");
   };
 
   return (
@@ -60,18 +80,47 @@ export default function MyPageScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>계정정보</Text>
-          <TouchableOpacity onPress={handleEdit} activeOpacity={0.7}>
-            <View style={styles.editButton}>
-              <Ionicons name="settings-outline" size={20} color={c.gray2} />
-            </View>
-          </TouchableOpacity>
+          {!isEditing && (
+            <TouchableOpacity onPress={handleEdit} activeOpacity={0.7}>
+              <View style={styles.editButton}>
+                <Ionicons name="settings-outline" size={20} color={c.gray2} />
+              </View>
+            </TouchableOpacity>
+          )}
+          {isEditing && (
+            <TouchableOpacity onPress={handleSubmit} activeOpacity={0.7}>
+              <View style={styles.editButton}>
+                <Text style={{ fontSize: 14, color: c.primary }}>완료</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.infoSection}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>이름</Text>
-            <Text style={styles.infoValue}>{name}</Text>
-          </View>
+          {!isEditing && (
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>이름</Text>
+              <Text style={styles.infoValue}>{name}</Text>
+            </View>
+          )}
+
+          {isEditing && (
+            <View
+              style={{
+                ...styles.infoItem,
+                borderColor: "#D0D0D0",
+                borderBottomWidth: 1,
+              }}
+            >
+              <Text style={styles.infoLabel}>이름</Text>
+              <TextInput
+                placeholder="이름을 입력하세요"
+                value={newName}
+                onChangeText={setNewName}
+                style={styles.infoValue}
+              />
+            </View>
+          )}
 
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>이메일 정보</Text>
@@ -172,18 +221,21 @@ const styles = StyleSheet.create({
   },
   editButton: {
     height: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   infoItem: {
-    paddingVertical: 10,
+    marginVertical: 10,
   },
   infoLabel: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 4,
+    marginBottom: 10,
   },
   infoValue: {
     fontSize: 16,
     color: "#333",
+    paddingVertical: 5,
   },
   actionItem: {
     paddingVertical: 10,
