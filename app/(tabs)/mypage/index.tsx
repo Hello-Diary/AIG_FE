@@ -3,13 +3,7 @@ import Reminder from "@/src/components/mypage/Reminder";
 import c from "@/src/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MyPageScreen() {
@@ -73,7 +67,7 @@ export default function MyPageScreen() {
         </View>
       </View>
 
-      {/* Actions Section */}
+      {/* 로그아웃 버튼 */}
       <View style={styles.actionsSection}>
         <TouchableOpacity
           style={styles.actionItem}
@@ -83,6 +77,7 @@ export default function MyPageScreen() {
           <Text style={styles.actionText}>로그아웃</Text>
         </TouchableOpacity>
 
+        {/* 탈퇴하기 버튼 */}
         <TouchableOpacity
           style={styles.actionItem}
           onPress={handleWithdraw}
@@ -92,7 +87,6 @@ export default function MyPageScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Floating edit button */}
       <PlusButton />
     </SafeAreaView>
   );
