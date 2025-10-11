@@ -1,3 +1,4 @@
+import c from "@/src/constants/colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
@@ -55,11 +56,7 @@ export default function Reminder() {
     if (Platform.OS === "android") setShowPicker(false);
 
     if (selectedDate) {
-      setReminderTime(selectedDate);
-      if (isReadingReminderOn) {
-        cancelNotification();
-        scheduleNotification(selectedDate);
-      }
+      setReminderTime(selectedDate); // 상태만 갱신, 알람은 아직 예약하지 않음
     }
   };
 
@@ -96,9 +93,9 @@ export default function Reminder() {
       <View style={styles.settingItem}>
         <Text style={styles.settingLabel}>읽기 작성 알림</Text>
         <Switch
-          trackColor={{ false: "#ccc", true: "#007AFF" }}
-          thumbColor="#FFFFFF"
-          ios_backgroundColor="#E5E5E5"
+          trackColor={{ false: "#ccc", true: c.primary }}
+          thumbColor={c.mainwhite}
+          ios_backgroundColor={c.bg}
           onValueChange={toggleSwitch}
           value={isReadingReminderOn}
           style={styles.switch}
@@ -127,12 +124,26 @@ export default function Reminder() {
         </TouchableOpacity>
 
         {showPicker && isReadingReminderOn && (
-          <DateTimePicker
-            value={reminderTime}
-            mode="time"
-            display={Platform.OS === "ios" ? "inline" : "default"}
-            onChange={onChangeTime}
-          />
+          <View style={styles.confirmContainer}>
+            {/* 시간 설정 스피너 */}
+            <DateTimePicker
+              value={reminderTime}
+              mode="time"
+              display={Platform.OS === "ios" ? "inline" : "default"}
+              onChange={onChangeTime}
+            />
+
+            {/* 확인 버튼 */}
+            <TouchableOpacity
+              onPress={() => {
+                scheduleNotification(reminderTime); // 버튼 눌러야 알람 예약
+                setShowPicker(false); // picker 닫기
+              }}
+              style={styles.confirmButton}
+            >
+              <Text style={styles.confirmButtonText}>확인</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </View>
     </View>
@@ -195,7 +206,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#F4F4F4",
     borderRadius: 8,
-    backgroundColor: "#fff",
+    backgroundColor: c.mainwhite,
     padding: 20,
     shadowColor: "#E1E1E1",
     shadowOffset: { width: 0, height: 4 },
@@ -226,5 +237,23 @@ const styles = StyleSheet.create({
   },
   switch: {
     transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
+  },
+  confirmContainer: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
+  confirmButton: {
+    paddingVertical: 8,
+    padding: 16,
+    backgroundColor: c.primary,
+    borderRadius: 8,
+  },
+  confirmButtonText: {
+    color: c.mainwhite,
+    fontWeight: "600",
+    fontSize: 14,
   },
 });
