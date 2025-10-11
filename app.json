@@ -37,6 +37,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "77ff8a13-c5db-4a8c-8475-d9091a82c511"
+      }
+    },
+    "owner": "yoominhwang"
   }
 }

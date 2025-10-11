@@ -1,7 +1,8 @@
-import c from "@/src/constants/colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import Constants from "expo-constants";
+import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Platform,
   StyleSheet,
@@ -11,12 +12,30 @@ import {
   View,
 } from "react-native";
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
 export default function Reminder() {
   const [showPicker, setShowPicker] = useState(false);
   const [reminderTime, setReminderTime] = useState<Date>(new Date());
   const [isReadingReminderOn, setIsReadingReminderOn] = useState(true);
 
   const REMINDER_ID = "reading-reminder";
+
+  // 초기화: 푸시 권한 요청, Android 채널 생성
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+
+    if (Platform.OS === "android") {
+      Notifications.getNotificationChannelsAsync();
+    }
+  }, []);
 
   // 스위치 토글
   const toggleSwitch = () => {
@@ -31,10 +50,10 @@ export default function Reminder() {
     }
   };
 
-  // 시간 선택 시
+  // 시간 선택
   const onChangeTime = (event: any, selectedDate?: Date) => {
-    setShowPicker(false);
-    if (Platform.OS === "android") setShowPicker(false); // 안드로이드에서는 선택 후 닫기
+    if (Platform.OS === "android") setShowPicker(false);
+
     if (selectedDate) {
       setReminderTime(selectedDate);
       if (isReadingReminderOn) {
@@ -44,15 +63,24 @@ export default function Reminder() {
     }
   };
 
-  // 알림 예약]
+  // 알림 예약
   const scheduleNotification = async (time: Date) => {
+    // 시간 기반 예약
+    const hour = time.getHours();
+    const minute = time.getMinutes();
+
     await Notifications.scheduleNotificationAsync({
       identifier: REMINDER_ID,
       content: {
         title: "📖 읽기 시간 알림",
         body: "지금 독서 기록을 작성할 시간이에요!",
+        data: { reminder: "reading" },
       },
-      trigger: null,
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        hour,
+        minute,
+      },
     });
   };
 
@@ -68,7 +96,7 @@ export default function Reminder() {
       <View style={styles.settingItem}>
         <Text style={styles.settingLabel}>읽기 작성 알림</Text>
         <Switch
-          trackColor={{ false: c.gray2, true: c.primary }}
+          trackColor={{ false: "#ccc", true: "#007AFF" }}
           thumbColor="#FFFFFF"
           ios_backgroundColor="#E5E5E5"
           onValueChange={toggleSwitch}
@@ -87,7 +115,7 @@ export default function Reminder() {
             <Text
               style={[
                 styles.settingValue,
-                !isReadingReminderOn && { color: c.gray2 },
+                !isReadingReminderOn && { color: "#ccc" },
               ]}
             >
               {reminderTime.toLocaleTimeString([], {
@@ -98,17 +126,65 @@ export default function Reminder() {
           )}
         </TouchableOpacity>
 
-        {(showPicker && isReadingReminderOn) && (
+        {showPicker && isReadingReminderOn && (
           <DateTimePicker
             value={reminderTime}
             mode="time"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
+            display={Platform.OS === "ios" ? "inline" : "default"}
             onChange={onChangeTime}
           />
         )}
       </View>
     </View>
   );
+}
+
+// 푸시 권한 요청 + Android 채널 생성
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("reading-channel", {
+      name: "Reading Reminder",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for push notification!");
+      return;
+    }
+
+    try {
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ??
+        Constants?.easConfig?.projectId;
+
+      if (!projectId) throw new Error("Project ID not found");
+
+      token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+      console.log("Expo Push Token:", token);
+    } catch (e) {
+      console.log("Push token error:", e);
+      token = `${e}`;
+    }
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  return token;
 }
 
 const styles = StyleSheet.create({
@@ -119,7 +195,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#F4F4F4",
     borderRadius: 8,
-    backgroundColor: c.mainwhite,
+    backgroundColor: "#fff",
     padding: 20,
     shadowColor: "#E1E1E1",
     shadowOffset: { width: 0, height: 4 },
@@ -130,7 +206,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: c.gray1,
+    color: "#333",
     marginBottom: 20,
   },
   settingLabel: {
