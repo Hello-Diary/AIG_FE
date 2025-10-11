@@ -76,29 +76,6 @@ export default function Dictionary() {
   ];
 
   const [selectedIdiom, setSelectedIdiom] = useState<IdiomData | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage: number = 8;
-
-  const totalPages: number = Math.ceil((idiomData.length * 2) / itemsPerPage); // 각 항목이 여러번 나타날 수 있음
-
-  // 페이지에 따라 표시할 데이터 생성
-  const getDisplayData = (): IdiomData[] => {
-    let displayItems: IdiomData[] = [];
-
-    // 첫 페이지: 모든 idiom 표시
-    if (currentPage === 1) {
-      displayItems = idiomData.map((item) => ({ ...item, showDetails: false }));
-      // "Have a blast"를 여러 번 추가 (UI와 동일하게)
-      const haveABlast = idiomData[0];
-      displayItems.push(
-        { ...haveABlast, id: "blast2", showDetails: false },
-        { ...haveABlast, id: "blast3", showDetails: false },
-        { ...haveABlast, id: "blast4", showDetails: false }
-      );
-    }
-
-    return displayItems.slice(0, itemsPerPage);
-  };
 
   const handleIdiomPress = (idiom: IdiomData): void => {
     if (selectedIdiom?.id === idiom.id) {
@@ -153,71 +130,15 @@ export default function Dictionary() {
     );
   };
 
-  const displayData = getDisplayData();
+  // mock data 반복 - id 중복으로 인해 same key ERROR 발생함
+  // TODO: API 명세 완료되면 데이터 받아오는 걸로 교체
+  const displayData = idiomData.concat(idiomData).concat(idiomData);
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {displayData.map((idiom, index) => renderIdiomItem(idiom, index))}
       </ScrollView>
-
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          onPress={() => setCurrentPage(Math.max(1, currentPage - 1))}
-          disabled={currentPage === 1}
-        >
-          <Text
-            style={[
-              styles.pageNumber,
-              currentPage === 1 && styles.disabledPage,
-            ]}
-          >
-            1
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setCurrentPage(2)}
-          disabled={currentPage === 2}
-        >
-          <Text
-            style={[
-              styles.pageNumber,
-              currentPage === 2 && styles.disabledPage,
-            ]}
-          >
-            2
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setCurrentPage(3)}
-          disabled={currentPage === 3}
-        >
-          <Text
-            style={[
-              styles.pageNumber,
-              currentPage === 3 && styles.disabledPage,
-            ]}
-          >
-            3
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setCurrentPage(4)}
-          disabled={currentPage === 4}
-        >
-          <Text
-            style={[
-              styles.pageNumber,
-              currentPage === 4 && styles.disabledPage,
-            ]}
-          >
-            4
-          </Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -313,22 +234,5 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 4,
     paddingLeft: 5,
-  },
-  pagination: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 10,
-    gap: 20,
-  },
-  pageNumber: {
-    fontSize: 16,
-    color: c.primary,
-    fontWeight: "500",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  disabledPage: {
-    color: "#ccc",
   },
 });
