@@ -17,10 +17,7 @@ export default function DictionaryScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <Dictionary
-        visible={true}
-        onClose={() => {}}
-      />
+      <Dictionary />
     </SafeAreaView>
   );
 }
