@@ -3,7 +3,7 @@ import Reminder from "@/src/components/mypage/Reminder";
 import c from "@/src/constants/colors";
 import { useUserStore } from "@/src/stores/useUserStore";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MyPageScreen() {
   // 전역으로 관리되는 사용자 정보 상태
-  const { userId, email, name, role, createdAt } = useUserStore();
+  const { userId, email, name } = useUserStore();
 
   // 사용자 정보 수정 시 사용하는 상태
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -51,6 +51,27 @@ export default function MyPageScreen() {
     // 탈퇴하기 로직
     console.log("탈퇴하기");
   };
+
+  useEffect(() => {
+    // TODO: GET /api/users/{userId} API 호출하여 사용자 정보 가져오기;
+    const response = {
+      data: {
+        userId: "id",
+        name: "처음 가져온 이름",
+        email: "처음 가져온 이메일",
+        role: "처음 가져온 역할",
+        createdAt: "2025-10-10",
+      },
+    };
+
+    const userData = response.data;
+
+    setNewName(userData.name);
+    useUserStore.getState().setName(userData.name);
+    useUserStore.getState().setEmail(userData.email);
+    useUserStore.getState().setRole(userData.role);
+    useUserStore.getState().setCreatedAt(new Date(userData.createdAt));
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
