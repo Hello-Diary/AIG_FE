@@ -10,6 +10,7 @@ const Colors = {
   mainwhite: '#FFFFFF',
   black: '#000000',
   blue: '#5856D6',
+  lightblue: '#F9FBFF',
   bluegray1: '#9199A6',
   gray1: '#626262',
   gray2: '#A8A8A8',
