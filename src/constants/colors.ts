@@ -18,6 +18,7 @@ const Colors = {
   gray4: '#E5E5E5',
   pink: '#FFE3E3',
   yellow: '#FDF1CF',
+  red: '#E74C3C',
 
   // 컴포넌트 색상
   bg: '#F9FBFF',
