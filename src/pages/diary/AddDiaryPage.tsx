@@ -11,7 +11,6 @@ import React, { useRef, useState } from "react";
 import {
   Animated,
   Keyboard,
-  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -24,18 +23,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
 import BackButton from "@/src/components/common/BackButton";
+import BottomModal from "@/src/components/diary/BottomModal";
 import DeleteModal from "@/src/components/diary/DeleteModal";
-import DictionaryBottomSheet from "@/src/components/diary/DictionaryBottomSheet";
 import RewriteModal from "@/src/components/diary/RewriteModal";
 import SaveModal from "@/src/components/diary/SaveModal";
-
-const topicSuggestions = [
-  "What was the happiest moment of your day?",
-  "Was there anything you regretted the most today?",
-  "What are you most grateful for right now?",
-  "What is one new thing you learned or realized today?",
-  "What do you hope to achieve tomorrow?",
-];
 
 export default function Diary() {
   const [title, setTitle] = useState("");
@@ -50,12 +41,20 @@ export default function Diary() {
   const emojiInputRef = useRef<TextInput>(null);
   const slideAnim = useRef(new Animated.Value(280)).current;
 
-  const [date, setDate] = useState(new Date("2025-09-30"));
-  const [tempDate, setTempDate] = useState(new Date("2025-09-30"));
+  const [date, setDate] = useState(new Date());
+  const [tempDate, setTempDate] = useState(date);
 
   const isButtonEnabled = title.trim() !== "" && description.trim() !== "";
 
   const [isDictionaryVisible, setDictionaryVisible] = useState(false);
+
+  const topicSuggestions = [
+    "What was the happiest moment of your day?",
+    "Was there anything you regretted the most today?",
+    "What are you most grateful for right now?",
+    "What is one new thing you learned or realized today?",
+    "What do you hope to achieve tomorrow?",
+  ];
 
   const handleSubmit = () => {
     if (!isButtonEnabled) return;
@@ -168,46 +167,39 @@ export default function Diary() {
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
-      <Modal
-        transparent={true}
+      <BottomModal
         visible={isPickerVisible}
-        animationType="slide"
-        onRequestClose={handleCancelDate}
+        title="날짜 지정"
+        pageType="datePicker"
+        onClose={handleCancelDate}
       >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPressOut={handleCancelDate}
-        >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>날짜 지정</Text>
-            <DateTimePicker
-              value={tempDate}
-              mode="date"
-              display={Platform.OS === "ios" ? "spinner" : "default"}
-              onChange={onDateChange}
-              locale="ko-KR"
-              textColor={c.black}
-            />
-            <View style={styles.modalButtonContainer}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={handleCancelDate}
-              >
-                <Text style={[styles.modalButtonText, styles.cancelButtonText]}>
-                  취소
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.confirmButton]}
-                onPress={handleConfirmDate}
-              >
-                <Text style={styles.modalButtonText}>확인</Text>
-              </TouchableOpacity>
-            </View>
+        <View style={styles.modalContent}>
+          <DateTimePicker
+            value={tempDate}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={onDateChange}
+            locale="ko-KR"
+            textColor={c.black}
+          />
+          <View style={styles.modalButtonContainer}>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.cancelButton]}
+              onPress={handleCancelDate}
+            >
+              <Text style={[styles.modalButtonText, styles.cancelButtonText]}>
+                취소
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, styles.confirmButton]}
+              onPress={handleConfirmDate}
+            >
+              <Text style={styles.modalButtonText}>확인</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </Modal>
+        </View>
+      </BottomModal>
 
       <RewriteModal
         visible={isRewriteModalVisible}
@@ -276,8 +268,10 @@ export default function Diary() {
         maxLength={4}
       />
 
-      <DictionaryBottomSheet
+      <BottomModal
         visible={isDictionaryVisible}
+        title="나의 사전"
+        pageType="dictionary"
         onClose={() => setDictionaryVisible(false)}
       />
 
@@ -417,12 +411,14 @@ export default function Diary() {
           <Text style={styles.submitButtonText}>피드백 받기</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.linkContainer}
-          onPress={() => setDictionaryVisible(true)}
-        >
-          <Text style={styles.linkText}>나의 사전 열기</Text>
-        </TouchableOpacity>
+        {(!isDictionaryVisible && !isPickerVisible) && (
+          <TouchableOpacity
+            style={styles.linkContainer}
+            onPress={() => setDictionaryVisible(true)}
+          >
+            <Text style={styles.linkText}>나의 사전 열기</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
