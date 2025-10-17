@@ -29,10 +29,13 @@ import BottomModal from "@/src/components/diary/BottomModal";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import RewriteModal from "@/src/components/diary/RewriteModal";
 import SaveModal from "@/src/components/diary/SaveModal";
+import { useRouter } from "expo-router";
 
 const inputAccessoryViewID = "diaryInputAccessory";
 
-export default function Diary() {
+export default function DiaryScreen() {
+  const [date, setDate] = useState(new Date());
+  const [tempDate, setTempDate] = useState(date);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("");
@@ -42,15 +45,13 @@ export default function Diary() {
   const [isRewriteModalVisible, setIsRewriteModalVisible] = useState(false);
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDictionaryVisible, setDictionaryVisible] = useState(false);
+
+  const router = useRouter();
   const emojiInputRef = useRef<TextInput>(null);
   const slideAnim = useRef(new Animated.Value(280)).current;
 
-  const [date, setDate] = useState(new Date());
-  const [tempDate, setTempDate] = useState(date);
-
   const isButtonEnabled = title.trim() !== "" && description.trim() !== "";
-
-  const [isDictionaryVisible, setDictionaryVisible] = useState(false);
 
   const topicSuggestions = [
     "What was the happiest moment of your day?",
@@ -62,12 +63,15 @@ export default function Diary() {
 
   const handleSubmit = () => {
     if (!isButtonEnabled) return;
-    console.log("Feedback submitted:", {
+
+    const parameter = {
       title,
       description,
       emoji: selectedEmoji,
       date,
-    });
+    };
+
+    router.push('/feedback');
   };
 
   const handleEmojiInput = (currentInputText: string) => {

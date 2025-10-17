@@ -1,8 +1,10 @@
 import HomeButton from "@/src/components/common/HomeButton";
 import MoreButton from "@/src/components/common/MoreButton";
 import c from "@/src/constants/colors";
-import React, { useState } from "react";
+import { useRouter } from "expo-router";
+import React, { useRef, useState } from "react";
 import {
+  Animated,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,11 +13,16 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function DiaryDetailPage() {
+export default function FeedbackScreen() {
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
 
-  const date = "2025.08.01";
+  const router = useRouter();
+  const slideAnim = useRef(new Animated.Value(280)).current;
+
+  const date = "2025/02/12";
 
   const originalDiary = `Today I waked up late and missed the school bus.
 I runned to the bus stop but the bus already gone.
@@ -54,8 +61,69 @@ It was not best day for me.`;
     { text: " my homework at home. It was not the best day for me.", key: "7" },
   ];
 
+  const toggleMenu = () => {
+    const toValue = isMenuOpen ? 280 : 0;
+    Animated.timing(slideAnim, {
+      toValue,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleMenuAction = (action: string) => {
+    if (action === "home") {
+      router.push("/");
+      toggleMenu();
+    } else if (action === "delete") {
+      setIsDeleteModalVisible(true);
+      toggleMenu();
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* Menu Overlay */}
+      {isMenuOpen && (
+        <TouchableOpacity
+          style={styles.menuOverlay}
+          activeOpacity={1}
+          onPress={toggleMenu}
+        />
+      )}
+
+      {/* Side Menu */}
+      <Animated.View
+        style={[styles.sideMenu, { transform: [{ translateX: slideAnim }] }]}
+      >
+        <View style={styles.menuContent}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleMenuAction("rewrite")}
+          >
+            <Text style={styles.menuItemText}>처음부터 다시 쓰기</Text>
+          </TouchableOpacity>
+          <View style={styles.menuDivider} />
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => handleMenuAction("save")}
+          >
+            <Text style={styles.menuItemText}>임시저장하고 나가기</Text>
+          </TouchableOpacity>
+          <View style={styles.menuDivider} />
+
+          <TouchableOpacity
+            style={[styles.menuItem, styles.menuItemDelete]}
+            onPress={() => handleMenuAction("delete")}
+          >
+            <Text style={[styles.menuItemText, styles.menuItemDeleteText]}>
+              삭제하기
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+
       {/* Header */}
       <View style={styles.header}>
         <HomeButton />
@@ -177,6 +245,57 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: c.bg || c.mainwhite,
   },
+
+  // Menu Styles
+  menuOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    zIndex: 998,
+  },
+  sideMenu: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: 280,
+    height: "100%",
+    backgroundColor: c.mainwhite,
+    zIndex: 999,
+    shadowColor: "#000",
+    shadowOffset: { width: -2, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  menuContent: {
+    paddingTop: 60,
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: "#E5E5E5",
+  },
+  menuItem: {
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: c.black,
+    fontWeight: "600",
+  },
+  menuItemDelete: {
+    backgroundColor: "transparent",
+  },
+  menuItemDeleteText: {
+    color: c.red,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  // Header Style
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -184,6 +303,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
+
   date: {
     fontSize: 16,
     fontWeight: "500",

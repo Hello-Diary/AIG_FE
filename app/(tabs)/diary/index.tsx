@@ -1,4 +1,4 @@
-import DiaryScreen from '@/src/pages/diary/AddDiaryPage';
+import DiaryScreen from '@/src/pages/diary/AddDiaryScreen';
 import React from 'react';
 
 export default function DiaryPage() {
