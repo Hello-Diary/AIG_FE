@@ -407,7 +407,7 @@ export default function Diary() {
           )}
         </TouchableOpacity>
 
-        {topicQuestion ? (
+        {topicQuestion && (
           <View style={styles.topicCard}>
             <Text style={styles.topicCardText}>{topicQuestion}</Text>
             <TouchableOpacity
@@ -417,7 +417,7 @@ export default function Diary() {
               <XIcon width={16} height={16} />
             </TouchableOpacity>
           </View>
-        ) : null}
+        )}
 
         <TouchableOpacity
           style={[
@@ -483,13 +483,6 @@ const styles = StyleSheet.create({
   menuContent: {
     paddingTop: 60,
   },
-  menuTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: c.black,
-    padding: 20,
-    textAlign: "center",
-  },
   menuDivider: {
     height: 1,
     backgroundColor: "#E5E5E5",
@@ -519,7 +512,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
   },
-  backButton: { padding: 8 },
   moreButton: { padding: 8 },
   dateContainer: { flexDirection: "row", alignItems: "center" },
   dateText: { fontSize: 16, color: c.black, fontWeight: "500" },
@@ -619,26 +611,12 @@ const styles = StyleSheet.create({
   linkText: { fontSize: 14, color: c.primary, textDecorationLine: "underline" },
 
   // Modal
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.4)",
-  },
   modalContent: {
     alignItems: "center",
     backgroundColor: "white",
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     padding: 16,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 10,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EFEFEF",
   },
   modalButtonContainer: {
     flexDirection: "row",
