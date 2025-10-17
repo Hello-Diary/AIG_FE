@@ -10,6 +10,8 @@ import DateTimePicker, {
 import React, { useRef, useState } from "react";
 import {
   Animated,
+  Button,
+  InputAccessoryView,
   Keyboard,
   Platform,
   ScrollView,
@@ -27,6 +29,8 @@ import BottomModal from "@/src/components/diary/BottomModal";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import RewriteModal from "@/src/components/diary/RewriteModal";
 import SaveModal from "@/src/components/diary/SaveModal";
+
+const inputAccessoryViewID = "diaryInputAccessory";
 
 export default function Diary() {
   const [title, setTitle] = useState("");
@@ -360,9 +364,24 @@ export default function Diary() {
             onChangeText={setDescription}
             placeholder="자유롭게 영어 일기를 작성하세요."
             placeholderTextColor={c.gray3}
-            multiline
+            multiline={true}
             textAlignVertical="top"
+            inputAccessoryViewID={inputAccessoryViewID}
           />
+
+          {Platform.OS === "ios" && (
+            <InputAccessoryView nativeID={inputAccessoryViewID}>
+              <View
+                style={{
+                  backgroundColor: c.lightblue,
+                  padding: 8,
+                  alignItems: "flex-end",
+                }}
+              >
+                <Button title="닫기" onPress={Keyboard.dismiss} />
+              </View>
+            </InputAccessoryView>
+          )}
         </View>
 
         <TouchableOpacity
@@ -411,7 +430,7 @@ export default function Diary() {
           <Text style={styles.submitButtonText}>피드백 받기</Text>
         </TouchableOpacity>
 
-        {(!isDictionaryVisible && !isPickerVisible) && (
+        {!isDictionaryVisible && !isPickerVisible && (
           <TouchableOpacity
             style={styles.linkContainer}
             onPress={() => setDictionaryVisible(true)}
