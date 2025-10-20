@@ -168,6 +168,8 @@ export default function DiaryScreen() {
     console.log("Diary deleted");
     setIsDeleteModalVisible(false);
     // 삭제 후 이전 화면으로 이동하는 로직 추가
+
+    router.push("/");
   };
 
   const handleDeleteCancel = () => {
