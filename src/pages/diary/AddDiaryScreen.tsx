@@ -190,6 +190,7 @@ export default function DiaryScreen() {
             onChange={onDateChange}
             locale="ko-KR"
             textColor={c.black}
+            maximumDate={new Date()}
           />
           <View style={styles.modalButtonContainer}>
             <TouchableOpacity
