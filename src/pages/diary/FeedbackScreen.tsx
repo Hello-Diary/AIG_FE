@@ -1,5 +1,7 @@
 import HomeButton from "@/src/components/common/HomeButton";
 import MoreButton from "@/src/components/common/MoreButton";
+import DeleteModal from "@/src/components/diary/DeleteModal";
+import MoveModal from "@/src/components/diary/MoveModal";
 import c from "@/src/constants/colors";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -15,6 +17,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FeedbackScreen() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isDestModalVisible, setIsDestModalVisible] = useState<boolean>(false);
+  // const [isListModalVisible, setIsListModalVisible] = useState<boolean>(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] =
     useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
@@ -24,7 +28,7 @@ export default function FeedbackScreen() {
   const slideAnim = useRef(new Animated.Value(280)).current;
 
   const data = {
-    date: "2025/02/12",
+    date: "2025.02.12",
     originalDiary:
       "Today I waked up late and missed the school bus. I runned to the bus stop but the bus already gone. My mom was little angry because I was not ready. At school, I forget my homework at home. It was not best day for me.",
   };
@@ -71,19 +75,67 @@ export default function FeedbackScreen() {
 
   const handleMenuAction = (action: string) => {
     if (action === "dictionary") {
-      router.push("/dictionary");
+      setIsDestModalVisible(true);
       toggleMenu();
-    // } else if (action === "list") {
-    //   router.push("/");
-    //   toggleMenu();
+      // } else if (action === "list") {
+      // setIsListModalVisible(true);
+      //   toggleMenu();
     } else if (action === "delete") {
       setIsDeleteModalVisible(true);
       toggleMenu();
     }
   };
 
+  const handleDestinationConfirm = () => {
+    setIsDestModalVisible(false);
+    router.push("/dictionary");
+  }
+
+  const handleDestinationCancel = () => {
+    setIsDestModalVisible(false);
+  }
+
+  // const handleListConfirm = () => {
+  //   setIsListModalVisible(false);
+  //   router.push("/list");
+  // }
+
+  // const handleListCancel = () => {
+  //   setIsListModalVisible(false);
+  // }
+
+  const handleDeleteConfirm = () => {
+    console.log("Diary deleted");
+    setIsDeleteModalVisible(false);
+    // 삭제 후 이전 화면으로 이동하는 로직 추가
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalVisible(false);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={[]}>
+      <MoveModal
+        destination="dictionary"
+        visible={isDestModalVisible}
+        onConfirm={handleDestinationConfirm}
+        onCancel={handleDestinationCancel}
+      />
+
+      {/* <MoveModal
+        destination="list"
+        visible={isListModalVisible}
+        onConfirm={handleListinationConfirm}
+        onCancel={handleListinationCancel}
+      /> */}
+
+      <DeleteModal
+        visible={isDeleteModalVisible}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
+
       {/* Menu Overlay */}
       {isMenuOpen && (
         <TouchableOpacity
@@ -122,129 +174,148 @@ export default function FeedbackScreen() {
               삭제하기
             </Text>
           </TouchableOpacity>
+          <View style={styles.menuDivider} />
         </View>
       </Animated.View>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <HomeButton />
-        <Text style={styles.date}>{data.date}</Text>
-        <MoreButton toggleMenu={toggleMenu} />
-      </View>
-
-      {/* Tabs */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, selectedTab === "my" && styles.tabActive]}
-          onPress={() => setSelectedTab("my")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "my" && styles.tabTextActive,
-            ]}
-          >
-            내가 쓴 일기
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, selectedTab === "ai" && styles.tabActive]}
-          onPress={() => {
-            setSelectedTab("ai");
-            setSelectedWord(null);
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "ai" && styles.tabTextActive,
-            ]}
-          >
-            AI 교정 일기
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 일기 카드 */}
-      <ScrollView style={styles.scroll}>
-        <View style={styles.card}>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>missed the bus</Text>
-            <View style={styles.emoji}>
-              <Text>😱</Text>
-            </View>
-          </View>
-
-          {selectedTab === "my" ? (
-            <Text style={styles.content}>{data.originalDiary}</Text>
-          ) : (
-            <Text style={styles.content}>
-              {correctedDiary.map((item) => {
-                if (item.explanation) {
-                  return (
-                    <Text
-                      key={item.key}
-                      style={[
-                        { color: c.primary },
-                        selectedWord === item.key && styles.selectedCorrection,
-                      ]}
-                      onPress={() =>
-                        setSelectedWord(
-                          selectedWord === item.key ? null : item.key
-                        )
-                      }
-                    >
-                      {item.text}
-                    </Text>
-                  );
-                } else {
-                  return (
-                    <Text key={item.key} style={{ color: c.black }}>
-                      {item.text}
-                    </Text>
-                  );
-                }
-              })}
-            </Text>
-          )}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <HomeButton />
+          <Text style={styles.date}>{data.date}</Text>
+          <MoreButton toggleMenu={toggleMenu} />
         </View>
 
-        {/* 안내 문구 / 단어 설명 */}
-        {selectedTab === "ai" && !selectedWord && (
-          <Text style={styles.tip}>
-            ⓘ 교정된 단어를 클릭하여 설명을 확인하세요.
-          </Text>
-        )}
-        {selectedTab === "ai" && selectedWord && (
-          <View style={styles.explainBox}>
-            <Text style={styles.explainTitle}>
-              {correctedDiary.find((d) => d.key === selectedWord)?.wrong} →{" "}
-              {correctedDiary.find((d) => d.key === selectedWord)?.text}
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, selectedTab === "my" && styles.tabActive]}
+            onPress={() => setSelectedTab("my")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "my" && styles.tabTextActive,
+              ]}
+            >
+              내가 쓴 일기
             </Text>
-            <Text style={styles.explainText}>
-              {correctedDiary.find((d) => d.key === selectedWord)?.explanation}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, selectedTab === "ai" && styles.tabActive]}
+            onPress={() => {
+              setSelectedTab("ai");
+              setSelectedWord(null);
+            }}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "ai" && styles.tabTextActive,
+              ]}
+            >
+              AI 교정 일기
             </Text>
-          </View>
-        )}
+          </TouchableOpacity>
+        </View>
 
-        {/* 하단 버튼 */}
+        {/* 일기 카드 */}
+        <View style={styles.scroll}>
+          <View style={styles.card}>
+            <View style={styles.titleRow}>
+              <Text style={styles.title}>missed the bus</Text>
+              <View style={styles.emoji}>
+                <Text>😱</Text>
+              </View>
+            </View>
+
+            {selectedTab === "my" ? (
+              <Text style={styles.content}>{data.originalDiary}</Text>
+            ) : (
+              <Text style={styles.content}>
+                {correctedDiary.map((item) => {
+                  if (item.explanation) {
+                    return (
+                      <Text
+                        key={item.key}
+                        style={[
+                          { color: c.primary },
+                          selectedWord === item.key &&
+                            styles.selectedCorrection,
+                        ]}
+                        onPress={() =>
+                          setSelectedWord(
+                            selectedWord === item.key ? null : item.key
+                          )
+                        }
+                      >
+                        {item.text}
+                      </Text>
+                    );
+                  } else {
+                    return (
+                      <Text key={item.key} style={{ color: c.black }}>
+                        {item.text}
+                      </Text>
+                    );
+                  }
+                })}
+              </Text>
+            )}
+          </View>
+
+          {/* 안내 문구 / 단어 설명 */}
+          {selectedTab === "ai" && !selectedWord && (
+            <Text style={styles.tip}>
+              ⓘ 교정된 단어를 클릭하여 설명을 확인하세요.
+            </Text>
+          )}
+          {selectedTab === "ai" && selectedWord && (
+            <View style={styles.explainBox}>
+              <Text style={styles.explainTitle}>
+                {correctedDiary.find((d) => d.key === selectedWord)?.wrong} →{" "}
+                {correctedDiary.find((d) => d.key === selectedWord)?.text}
+              </Text>
+              <Text style={styles.explainText}>
+                {
+                  correctedDiary.find((d) => d.key === selectedWord)
+                    ?.explanation
+                }
+              </Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+
+      {/* 하단 버튼 */}
+      <View style={styles.bottomFixedContainer}>
         <TouchableOpacity style={styles.footerButton}>
           <View style={styles.footerButtonUnderline}>
             <Text style={styles.footerButtonText}>AI 추천 표현 보기</Text>
           </View>
           <Text style={styles.footerButtonText}>&gt;</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex",
-    flexDirection: "column",
     flex: 1,
     backgroundColor: c.bg,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
   },
 
   // Menu Styles
@@ -301,7 +372,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
     paddingVertical: 15,
   },
   date: {
@@ -310,7 +380,8 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: "row",
-    margin: 20,
+    marginTop: 10,
+    marginBottom: 20,
     backgroundColor: c.bg,
     borderWidth: 1,
     borderColor: c.primary,
@@ -335,7 +406,6 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flex: 1,
-    paddingHorizontal: 20,
   },
   card: {
     borderWidth: 1,
@@ -391,6 +461,18 @@ const styles = StyleSheet.create({
     color: c.black,
     fontSize: 13,
     lineHeight: 20,
+  },
+
+  // Button
+  bottomFixedContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: c.bg,
+    paddingHorizontal: 20,
+    paddingBottom: 55,
+    paddingTop: 12,
   },
   footerButton: {
     flexDirection: "row",

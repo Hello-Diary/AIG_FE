@@ -266,6 +266,7 @@ export default function DiaryScreen() {
               삭제하기
             </Text>
           </TouchableOpacity>
+          <View style={styles.menuDivider} />
         </View>
       </Animated.View>
 
@@ -274,7 +275,7 @@ export default function DiaryScreen() {
         style={styles.hiddenInput}
         value={selectedEmoji}
         onChangeText={handleEmojiInput}
-        maxLength={4}
+        maxLength={2}
       />
 
       <BottomModal
