@@ -25,6 +25,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
 import BackButton from "@/src/components/common/BackButton";
+import MoreButton from "@/src/components/common/MoreButton";
 import BottomModal from "@/src/components/diary/BottomModal";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import RewriteModal from "@/src/components/diary/RewriteModal";
@@ -71,7 +72,7 @@ export default function DiaryScreen() {
       date,
     };
 
-    router.push('/feedback');
+    router.push("/feedback");
   };
 
   const handleEmojiInput = (currentInputText: string) => {
@@ -290,6 +291,7 @@ export default function DiaryScreen() {
       >
         <View style={styles.header}>
           <BackButton />
+
           <TouchableOpacity
             style={styles.dateContainer}
             onPress={() => setPickerVisible(true)}
@@ -297,62 +299,46 @@ export default function DiaryScreen() {
             <Text style={styles.dateText}>{formatDate(date)}</Text>
             <ChevronDownIcon style={{ marginLeft: 6 }} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.moreButton} onPress={toggleMenu}>
-            <Svg width="17" height="17" viewBox="0 0 17 17" fill="none">
-              <Path
-                d="M8.89209 9.28748C9.26525 9.28748 9.56775 8.98497 9.56775 8.61182C9.56775 8.23866 9.26525 7.93616 8.89209 7.93616C8.51893 7.93616 8.21643 8.23866 8.21643 8.61182C8.21643 8.98497 8.51893 9.28748 8.89209 9.28748Z"
-                stroke="#626262"
-                strokeWidth="1.35132"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <Path
-                d="M13.6217 9.28748C13.9949 9.28748 14.2974 8.98497 14.2974 8.61182C14.2974 8.23866 13.9949 7.93616 13.6217 7.93616C13.2485 7.93616 12.946 8.23866 12.946 8.61182C12.946 8.98497 13.2485 9.28748 13.6217 9.28748Z"
-                stroke="#626262"
-                strokeWidth="1.35132"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <Path
-                d="M4.16248 9.28748C4.53563 9.28748 4.83813 8.98497 4.83813 8.61182C4.83813 8.23866 4.53563 7.93616 4.16248 7.93616C3.78932 7.93616 3.48682 8.23866 3.48682 8.61182C3.48682 8.98497 3.78932 9.28748 4.16248 9.28748Z"
-                stroke="#626262"
-                strokeWidth="1.35132"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </Svg>
-          </TouchableOpacity>
+
+          <MoreButton toggleMenu={toggleMenu} />
         </View>
 
+        {/* Diary Writing Card */}
         <View style={styles.card}>
-          <View style={styles.titleContainer}>
-            <TextInput
-              style={styles.titleInput}
-              value={title}
-              onChangeText={setTitle}
-              placeholder="제목없음"
-              placeholderTextColor={c.gray3}
-            />
-            <TouchableOpacity style={styles.editIcon}>
-              <Svg width="15" height="16" viewBox="0 0 15 16" fill="none">
-                <Path
-                  d="M7.5 13H13.125"
-                  stroke="#959595"
-                  strokeWidth="1.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <Path
-                  d="M10.3125 2.68764C10.5611 2.439 10.8984 2.29932 11.25 2.29932C11.4241 2.29932 11.5965 2.33361 11.7574 2.40024C11.9182 2.46687 12.0644 2.56453 12.1875 2.68764C12.3106 2.81076 12.4083 2.95691 12.4749 3.11777C12.5415 3.27863 12.5758 3.45103 12.5758 3.62514C12.5758 3.79925 12.5415 3.97166 12.4749 4.13251C12.4083 4.29337 12.3106 4.43953 12.1875 4.56264L4.375 12.3751L1.875 13.0001L2.5 10.5001L10.3125 2.68764Z"
-                  stroke="#959595"
-                  strokeWidth="1.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-            </TouchableOpacity>
+          <View style={styles.cardHeader}>
+            <View style={styles.titleContainer}>
+              <TextInput
+                style={styles.titleInput}
+                value={title}
+                onChangeText={setTitle}
+                placeholder="제목없음"
+                placeholderTextColor={c.gray3}
+              />
+
+              {/* Pencil Icon with no functions */}
+              <TouchableOpacity style={styles.editIcon}>
+                <Svg width="18" height="18" viewBox="0 0 15 16" fill="none">
+                  <Path
+                    d="M7.5 13H13.125"
+                    stroke="#959595"
+                    strokeWidth="1.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <Path
+                    d="M10.3125 2.68764C10.5611 2.439 10.8984 2.29932 11.25 2.29932C11.4241 2.29932 11.5965 2.33361 11.7574 2.40024C11.9182 2.46687 12.0644 2.56453 12.1875 2.68764C12.3106 2.81076 12.4083 2.95691 12.4749 3.11777C12.5415 3.27863 12.5758 3.45103 12.5758 3.62514C12.5758 3.79925 12.5415 3.97166 12.4749 4.13251C12.4083 4.29337 12.3106 4.43953 12.1875 4.56264L4.375 12.3751L1.875 13.0001L2.5 10.5001L10.3125 2.68764Z"
+                    stroke="#959595"
+                    strokeWidth="1.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </Svg>
+              </TouchableOpacity>
+            </View>
+
+            {/* Emoji Button */}
             <TouchableOpacity
-              style={styles.imageButton}
+              style={styles.emojiButton}
               onPress={() => emojiInputRef.current?.focus()}
             >
               {selectedEmoji ? (
@@ -362,6 +348,8 @@ export default function DiaryScreen() {
               )}
             </TouchableOpacity>
           </View>
+
+          {/* Diary Writing Section */}
           <TextInput
             style={styles.descriptionInput}
             value={description}
@@ -422,7 +410,10 @@ export default function DiaryScreen() {
             </TouchableOpacity>
           </View>
         )}
+      </ScrollView>
 
+      {/* Button Section */}
+      <View style={styles.bottomFixedContainer}>
         <TouchableOpacity
           style={[
             styles.submitButton,
@@ -442,23 +433,24 @@ export default function DiaryScreen() {
             <Text style={styles.linkText}>나의 사전 열기</Text>
           </TouchableOpacity>
         )}
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  hiddenInput: {
-    position: "absolute",
-    top: -100,
-    left: 0,
-    height: 0,
-    width: 0,
-    opacity: 0,
+  container: {
+    flex: 1,
+    backgroundColor: c.bg,
   },
-  container: { flex: 1, backgroundColor: c.mainwhite },
-  scrollView: { flex: 1 },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 50, paddingBottom: 20 },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+  },
 
   // Menu Styles
   menuOverlay: {
@@ -516,13 +508,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
   },
-  moreButton: { padding: 8 },
-  dateContainer: { flexDirection: "row", alignItems: "center" },
-  dateText: { fontSize: 16, color: c.black, fontWeight: "500" },
+  dateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  dateText: {
+    fontSize: 16,
+    color: c.black,
+    fontWeight: "500",
+  },
 
   // Card
   card: {
-    backgroundColor: "rgba(255, 255, 255, 0.60)",
+    backgroundColor: c.mainwhite,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: c.border,
@@ -530,23 +528,41 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     height: 350,
   },
-  titleContainer: {
+  cardHeader: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: c.border,
     marginBottom: 12,
+    position: "relative",
+  },
+  titleContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   titleInput: {
-    flex: 1,
     fontSize: 15,
     color: c.black,
-    padding: 0,
-    textAlign: "center",
   },
-  editIcon: { padding: 8 },
-  imageButton: {
+  hiddenInput: {
+    position: "absolute",
+    top: -100,
+    left: 0,
+    height: 0,
+    width: 0,
+    opacity: 0,
+  },
+  editIcon: {
+    padding: 5,
+  },
+  emojiButton: {
+    position: "absolute",
+    top: 0,
+    right: 3,
     width: 32,
     height: 32,
     borderRadius: 6.759,
@@ -555,8 +571,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: 8,
   },
-  emojiText: { fontSize: 20 },
-  descriptionInput: { flex: 1, fontSize: 13, color: c.black, lineHeight: 20 },
+  emojiText: {
+    fontSize: 20,
+  },
+  descriptionInput: {
+    flex: 1,
+    fontSize: 13,
+    color: c.black,
+    lineHeight: 20,
+  },
 
   // Info
   infoContainer: {
@@ -599,12 +622,22 @@ const styles = StyleSheet.create({
   topicCardCloseButton: { padding: 4 },
 
   // Button
+  bottomFixedContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: c.bg,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 12,
+  },
   submitButton: {
     backgroundColor: c.button,
     borderRadius: 10,
     paddingVertical: 20,
     alignItems: "center",
-    marginTop: 100,
+    marginTop: 16,
     marginBottom: 16,
   },
   submitButtonActive: { backgroundColor: c.primary },

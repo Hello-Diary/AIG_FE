@@ -15,21 +15,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FeedbackScreen() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState<boolean>(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] =
+    useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
 
   const router = useRouter();
   const slideAnim = useRef(new Animated.Value(280)).current;
 
-  const date = "2025/02/12";
-
-  const originalDiary = `Today I waked up late and missed the school bus.
-I runned to the bus stop but the bus already gone.
-My mom was little angry because I was not ready.
-At school, I forget my homework at home.
-It was not best day for me.`;
-
+  const data = {
+    date: "2025/02/12",
+    originalDiary:
+      "Today I waked up late and missed the school bus. I runned to the bus stop but the bus already gone. My mom was little angry because I was not ready. At school, I forget my homework at home. It was not best day for me.",
+  };
   const correctedDiary = [
     { text: "Today I ", key: "1" },
     {
@@ -72,9 +70,12 @@ It was not best day for me.`;
   };
 
   const handleMenuAction = (action: string) => {
-    if (action === "home") {
-      router.push("/");
+    if (action === "dictionary") {
+      router.push("/dictionary");
       toggleMenu();
+    // } else if (action === "list") {
+    //   router.push("/");
+    //   toggleMenu();
     } else if (action === "delete") {
       setIsDeleteModalVisible(true);
       toggleMenu();
@@ -99,19 +100,19 @@ It was not best day for me.`;
         <View style={styles.menuContent}>
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => handleMenuAction("rewrite")}
+            onPress={() => handleMenuAction("dictionary")}
           >
-            <Text style={styles.menuItemText}>처음부터 다시 쓰기</Text>
+            <Text style={styles.menuItemText}>나의 사전으로 이동하기</Text>
           </TouchableOpacity>
           <View style={styles.menuDivider} />
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => handleMenuAction("save")}
+            onPress={() => handleMenuAction("list")}
           >
-            <Text style={styles.menuItemText}>임시저장하고 나가기</Text>
+            <Text style={styles.menuItemText}>일기 목록 보기</Text>
           </TouchableOpacity>
-          <View style={styles.menuDivider} />
+          <View style={styles.menuDivider} /> */}
 
           <TouchableOpacity
             style={[styles.menuItem, styles.menuItemDelete]}
@@ -127,8 +128,8 @@ It was not best day for me.`;
       {/* Header */}
       <View style={styles.header}>
         <HomeButton />
-        <Text style={styles.date}>{date}</Text>
-        <MoreButton />
+        <Text style={styles.date}>{data.date}</Text>
+        <MoreButton toggleMenu={toggleMenu} />
       </View>
 
       {/* Tabs */}
@@ -175,7 +176,7 @@ It was not best day for me.`;
           </View>
 
           {selectedTab === "my" ? (
-            <Text style={styles.content}>{originalDiary}</Text>
+            <Text style={styles.content}>{data.originalDiary}</Text>
           ) : (
             <Text style={styles.content}>
               {correctedDiary.map((item) => {
@@ -198,7 +199,7 @@ It was not best day for me.`;
                   );
                 } else {
                   return (
-                    <Text key={item.key} style={{ color: "#000" }}>
+                    <Text key={item.key} style={{ color: c.black }}>
                       {item.text}
                     </Text>
                   );
@@ -243,7 +244,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     flex: 1,
-    backgroundColor: c.bg || c.mainwhite,
+    backgroundColor: c.bg,
   },
 
   // Menu Styles
@@ -303,7 +304,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
-
   date: {
     fontSize: 16,
     fontWeight: "500",
@@ -315,11 +315,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: c.primary,
     borderRadius: 30,
+    overflow: "hidden",
   },
-  tab: { flex: 1, alignItems: "center", paddingVertical: 10 },
+  tab: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+  },
   tabActive: {
     backgroundColor: c.primary,
-    borderRadius: 30,
   },
   tabText: {
     color: c.primary,
