@@ -3,25 +3,33 @@ import c from "@/src/constants/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useEffect, useRef } from "react";
 import {
-    Animated,
-    Dimensions,
-    Modal,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-interface DictionaryBottomSheetProps {
+interface BottomModalProps {
   visible: boolean;
+  title: string;
+  pageType: string;
   onClose: () => void;
 }
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
-const SHEET_HEIGHT = SCREEN_HEIGHT * 0.7;   // 화면 높이의 70% 까지 나의 사전 모달 보여지도록
+const SHEET_HEIGHT = SCREEN_HEIGHT * 0.55; // 화면 높이의 55% 까지 나의 사전 모달 보여지도록
 
-export default function DictionaryBottomSheet({ visible, onClose }: DictionaryBottomSheetProps) {
+export default function BottomModal({
+  visible,
+  title,
+  pageType,
+  onClose,
+  children,
+}: BottomModalProps & { children?: React.ReactNode }) {
   const slideY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
 
   useEffect(() => {
@@ -33,7 +41,12 @@ export default function DictionaryBottomSheet({ visible, onClose }: DictionaryBo
   }, [visible]);
 
   return (
-    <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
+    <Modal
+      transparent
+      visible={visible}
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       {/* 배경 (클릭 시 닫기) */}
       <Pressable style={styles.overlay} onPress={onClose} />
 
@@ -48,10 +61,11 @@ export default function DictionaryBottomSheet({ visible, onClose }: DictionaryBo
       >
         <View style={styles.header}>
           <View style={styles.handle} />
-          <Text style={styles.title}>나의 사전</Text>
+          <Text style={styles.title}>{title}</Text>
         </View>
 
-        <Dictionary />
+        {pageType === "dictionary" && <Dictionary />}
+        {pageType === "datePicker" && children}
 
         <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
           <Ionicons name="arrow-down" size={16} color={c.primary} />
