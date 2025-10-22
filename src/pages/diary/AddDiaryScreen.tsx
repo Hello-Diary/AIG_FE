@@ -30,17 +30,20 @@ import BottomModal from "@/src/components/diary/BottomModal";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import RewriteModal from "@/src/components/diary/RewriteModal";
 import SaveModal from "@/src/components/diary/SaveModal";
+import { Question } from "@/src/types/question";
 import { useRouter } from "expo-router";
 
 const inputAccessoryViewID = "diaryInputAccessory";
 
 export default function DiaryScreen() {
+  const [topicQuestion, setTopicQuestion] = useState<Question | null>(null);
+
   const [date, setDate] = useState(new Date());
   const [tempDate, setTempDate] = useState(date);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("");
-  const [topicQuestion, setTopicQuestion] = useState("");
+
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRewriteModalVisible, setIsRewriteModalVisible] = useState(false);
@@ -53,14 +56,6 @@ export default function DiaryScreen() {
   const slideAnim = useRef(new Animated.Value(280)).current;
 
   const isButtonEnabled = title.trim() !== "" && description.trim() !== "";
-
-  const topicSuggestions = [
-    "What was the happiest moment of your day?",
-    "Was there anything you regretted the most today?",
-    "What are you most grateful for right now?",
-    "What is one new thing you learned or realized today?",
-    "What do you hope to achieve tomorrow?",
-  ];
 
   const handleSubmit = () => {
     if (!isButtonEnabled) return;
@@ -80,20 +75,46 @@ export default function DiaryScreen() {
       setSelectedEmoji("");
       return;
     }
+
     const newEmoji = currentInputText.replace(selectedEmoji, "");
+
     if (newEmoji) {
       setSelectedEmoji(newEmoji);
       Keyboard.dismiss();
     }
   };
 
-  const handleDrawTopic = () => {
-    const randomIndex = Math.floor(Math.random() * topicSuggestions.length);
-    setTopicQuestion(topicSuggestions[randomIndex]);
+  const handleDrawTopic = async () => {
+    // const res = await getAllQuestion();
+    const res = [
+      {
+        questionId: "1",
+        text: "question 1",
+        createdAt: new Date(),
+      },
+      {
+        questionId: "2",
+        text: "question 2",
+        createdAt: new Date(),
+      },
+      {
+        questionId: "3",
+        text: "question 3",
+        createdAt: new Date(),
+      },
+      {
+        questionId: "4",
+        text: "question 4",
+        createdAt: new Date(),
+      },
+    ];
+    const randomIndex = Math.floor(Math.random() * res.length);
+
+    setTopicQuestion(res[randomIndex]);
   };
 
   const handleClearTopic = () => {
-    setTopicQuestion("");
+    setTopicQuestion(null);
   };
 
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -147,7 +168,12 @@ export default function DiaryScreen() {
   const handleRewriteConfirm = () => {
     console.log("Diary deleted");
     setIsRewriteModalVisible(false);
+
     // 다시 쓰는 로직
+    setTitle("");
+    setDescription("");
+    setDate(new Date());
+    setSelectedEmoji("");
   };
 
   const handleRewriteCancel = () => {
@@ -157,6 +183,7 @@ export default function DiaryScreen() {
   const handleSaveConfirm = () => {
     console.log("Diary saved");
     setIsSaveModalVisible(false);
+
     // 저장 후 main으로 가는 로직
   };
 
@@ -167,7 +194,10 @@ export default function DiaryScreen() {
   const handleDeleteConfirm = () => {
     console.log("Diary deleted");
     setIsDeleteModalVisible(false);
-    // 삭제 후 이전 화면으로 이동하는 로직 추가
+
+    // TODO: Journal Delete API 호출
+
+    router.push("/");
   };
 
   const handleDeleteCancel = () => {
@@ -403,7 +433,7 @@ export default function DiaryScreen() {
 
         {topicQuestion && (
           <View style={styles.topicCard}>
-            <Text style={styles.topicCardText}>{topicQuestion}</Text>
+            <Text style={styles.topicCardText}>{topicQuestion.text}</Text>
             <TouchableOpacity
               style={styles.topicCardCloseButton}
               onPress={handleClearTopic}
