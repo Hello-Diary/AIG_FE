@@ -1,7 +1,9 @@
 export interface JournalRequest {
   title: string;
   content: string;
-  questionId: string;
+  emoji: string | null;
+  date: Date;
+  questionId: string | null;
 }
 
 export interface JournalResponse {
@@ -9,5 +11,7 @@ export interface JournalResponse {
   userId: string;
   title: string;
   content: string;
+  emoji: string | null;
+  date: Date;
   submittedAt: Date;
 }

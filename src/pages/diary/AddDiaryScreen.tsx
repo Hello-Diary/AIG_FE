@@ -35,12 +35,15 @@ import { useRouter } from "expo-router";
 const inputAccessoryViewID = "diaryInputAccessory";
 
 export default function DiaryScreen() {
+  // TODO: topic question을 객체로 바꾸기
+  const [topicQuestionId, setTopicQuestionId] = useState("");
+
   const [date, setDate] = useState(new Date());
   const [tempDate, setTempDate] = useState(date);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("");
-  const [topicQuestion, setTopicQuestion] = useState("");
+  
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRewriteModalVisible, setIsRewriteModalVisible] = useState(false);
@@ -80,7 +83,9 @@ export default function DiaryScreen() {
       setSelectedEmoji("");
       return;
     }
+
     const newEmoji = currentInputText.replace(selectedEmoji, "");
+
     if (newEmoji) {
       setSelectedEmoji(newEmoji);
       Keyboard.dismiss();
@@ -89,11 +94,12 @@ export default function DiaryScreen() {
 
   const handleDrawTopic = () => {
     const randomIndex = Math.floor(Math.random() * topicSuggestions.length);
-    setTopicQuestion(topicSuggestions[randomIndex]);
+    // TODO: topic question GET API에서 받아온 questionId 넣기
+    setTopicQuestionId(topicSuggestions[randomIndex]);
   };
 
   const handleClearTopic = () => {
-    setTopicQuestion("");
+    setTopicQuestionId("");
   };
 
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -147,7 +153,12 @@ export default function DiaryScreen() {
   const handleRewriteConfirm = () => {
     console.log("Diary deleted");
     setIsRewriteModalVisible(false);
+
     // 다시 쓰는 로직
+    setTitle("");
+    setDescription("");
+    setDate(new Date());
+    setSelectedEmoji("");
   };
 
   const handleRewriteCancel = () => {
@@ -157,6 +168,7 @@ export default function DiaryScreen() {
   const handleSaveConfirm = () => {
     console.log("Diary saved");
     setIsSaveModalVisible(false);
+
     // 저장 후 main으로 가는 로직
   };
 
@@ -175,7 +187,7 @@ export default function DiaryScreen() {
   const handleDeleteCancel = () => {
     setIsDeleteModalVisible(false);
   };
-
+  
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <BottomModal
@@ -384,7 +396,7 @@ export default function DiaryScreen() {
           style={styles.infoContainer}
           onPress={handleDrawTopic}
         >
-          {topicQuestion ? (
+          {topicQuestionId ? (
             <>
               <View style={styles.alertIconContainer}>
                 <RefreshIcon />
@@ -403,9 +415,9 @@ export default function DiaryScreen() {
           )}
         </TouchableOpacity>
 
-        {topicQuestion && (
+        {topicQuestionId && (
           <View style={styles.topicCard}>
-            <Text style={styles.topicCardText}>{topicQuestion}</Text>
+            <Text style={styles.topicCardText}>{topicQuestionId}</Text>
             <TouchableOpacity
               style={styles.topicCardCloseButton}
               onPress={handleClearTopic}
