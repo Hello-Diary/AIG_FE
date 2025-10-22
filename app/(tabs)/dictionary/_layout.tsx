@@ -1,7 +1,6 @@
 import BackButton from '@/src/components/common/BackButton';
 
 import { Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
 
 export default function DictionaryLayout() {
   return (
@@ -19,6 +18,3 @@ export default function DictionaryLayout() {
     </Stack>
   );
 }
-
-const styles = StyleSheet.create({
-});
