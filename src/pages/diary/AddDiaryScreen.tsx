@@ -30,20 +30,20 @@ import BottomModal from "@/src/components/diary/BottomModal";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import RewriteModal from "@/src/components/diary/RewriteModal";
 import SaveModal from "@/src/components/diary/SaveModal";
+import { Question } from "@/src/types/question";
 import { useRouter } from "expo-router";
 
 const inputAccessoryViewID = "diaryInputAccessory";
 
 export default function DiaryScreen() {
-  // TODO: topic question을 객체로 바꾸기
-  const [topicQuestionId, setTopicQuestionId] = useState("");
+  const [topicQuestion, setTopicQuestion] = useState<Question | null>(null);
 
   const [date, setDate] = useState(new Date());
   const [tempDate, setTempDate] = useState(date);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("");
-  
+
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRewriteModalVisible, setIsRewriteModalVisible] = useState(false);
@@ -57,13 +57,12 @@ export default function DiaryScreen() {
 
   const isButtonEnabled = title.trim() !== "" && description.trim() !== "";
 
-  const topicSuggestions = [
-    "What was the happiest moment of your day?",
-    "Was there anything you regretted the most today?",
-    "What are you most grateful for right now?",
-    "What is one new thing you learned or realized today?",
-    "What do you hope to achieve tomorrow?",
-  ];
+  // mock data for questions
+  const questionResponse = {
+    questionId: "1",
+    text: "What was the happiest moment of your day?",
+    createdAt: new Date(),
+  };
 
   const handleSubmit = () => {
     if (!isButtonEnabled) return;
@@ -93,13 +92,12 @@ export default function DiaryScreen() {
   };
 
   const handleDrawTopic = () => {
-    const randomIndex = Math.floor(Math.random() * topicSuggestions.length);
     // TODO: topic question GET API에서 받아온 questionId 넣기
-    setTopicQuestionId(topicSuggestions[randomIndex]);
+    setTopicQuestion(questionResponse);
   };
 
   const handleClearTopic = () => {
-    setTopicQuestionId("");
+    setTopicQuestion(null);
   };
 
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
@@ -187,7 +185,7 @@ export default function DiaryScreen() {
   const handleDeleteCancel = () => {
     setIsDeleteModalVisible(false);
   };
-  
+
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <BottomModal
@@ -396,7 +394,7 @@ export default function DiaryScreen() {
           style={styles.infoContainer}
           onPress={handleDrawTopic}
         >
-          {topicQuestionId ? (
+          {topicQuestion ? (
             <>
               <View style={styles.alertIconContainer}>
                 <RefreshIcon />
@@ -415,9 +413,9 @@ export default function DiaryScreen() {
           )}
         </TouchableOpacity>
 
-        {topicQuestionId && (
+        {topicQuestion && (
           <View style={styles.topicCard}>
-            <Text style={styles.topicCardText}>{topicQuestionId}</Text>
+            <Text style={styles.topicCardText}>{topicQuestion.text}</Text>
             <TouchableOpacity
               style={styles.topicCardCloseButton}
               onPress={handleClearTopic}
