@@ -57,13 +57,6 @@ export default function DiaryScreen() {
 
   const isButtonEnabled = title.trim() !== "" && description.trim() !== "";
 
-  // mock data for questions
-  const questionResponse = {
-    questionId: "1",
-    text: "What was the happiest moment of your day?",
-    createdAt: new Date(),
-  };
-
   const handleSubmit = () => {
     if (!isButtonEnabled) return;
 
@@ -91,9 +84,33 @@ export default function DiaryScreen() {
     }
   };
 
-  const handleDrawTopic = () => {
-    // TODO: topic question GET API에서 받아온 questionId 넣기
-    setTopicQuestion(questionResponse);
+  const handleDrawTopic = async () => {
+    // const res = await getAllQuestion();
+    const res = [
+      {
+        questionId: "1",
+        text: "question 1",
+        createdAt: new Date(),
+      },
+      {
+        questionId: "2",
+        text: "question 2",
+        createdAt: new Date(),
+      },
+      {
+        questionId: "3",
+        text: "question 3",
+        createdAt: new Date(),
+      },
+      {
+        questionId: "4",
+        text: "question 4",
+        createdAt: new Date(),
+      },
+    ];
+    const randomIndex = Math.floor(Math.random() * res.length);
+
+    setTopicQuestion(res[randomIndex]);
   };
 
   const handleClearTopic = () => {
@@ -177,7 +194,8 @@ export default function DiaryScreen() {
   const handleDeleteConfirm = () => {
     console.log("Diary deleted");
     setIsDeleteModalVisible(false);
-    // 삭제 후 이전 화면으로 이동하는 로직 추가
+
+    // TODO: Journal Delete API 호출
 
     router.push("/");
   };
