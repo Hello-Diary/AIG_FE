@@ -13,7 +13,7 @@ export default function DictionaryScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <BackButton />
-        <Text style={styles.headerTitle}>나의사전</Text>
+        <Text style={styles.headerTitle}>나의 사전</Text>
         <View style={{ width: 24 }} />
       </View>
 
