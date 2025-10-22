@@ -82,7 +82,7 @@ export default function MyPageScreen() {
             source={
               profileUrl
                 ? { uri: profileUrl }
-                : require("@/assets/images/default-profile.png")
+                : require("@/assets/icons/default-profile.png")
             }
             style={styles.profileImage}
           />
