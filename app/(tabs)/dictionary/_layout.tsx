@@ -16,15 +16,6 @@ export default function DictionaryLayout() {
           ),
         }}
       />
-      {/* <Stack.Screen
-        name="add"
-        options={{
-          title: '단어 추가',
-          headerStyle: styles.header,
-          headerTitleStyle: styles.title,
-          headerShadowVisible: false,
-        }}
-      /> */}
     </Stack>
   );
 }

@@ -1,7 +1,7 @@
-import ChevronDownIcon from "@/assets/images/ChevronDownIcon.svg";
-import Imoticon from "@/assets/images/imoticon_btn.svg";
-import RefreshIcon from "@/assets/images/refresh.svg";
-import XIcon from "@/assets/images/X_btn.svg";
+import DownArrowIcon from "@/assets/icons/down-arrow.svg";
+import EmojiIcon from "@/assets/icons/emoji-button.svg";
+import RefreshIcon from "@/assets/icons/refresh.svg";
+import XIcon from "@/assets/icons/x-button.svg";
 
 import c from "@/src/constants/colors";
 import DateTimePicker, {
@@ -329,7 +329,7 @@ export default function DiaryScreen() {
             onPress={() => setPickerVisible(true)}
           >
             <Text style={styles.dateText}>{formatDate(date)}</Text>
-            <ChevronDownIcon style={{ marginLeft: 6 }} />
+            <DownArrowIcon style={{ marginLeft: 6 }} />
           </TouchableOpacity>
 
           <MoreButton toggleMenu={toggleMenu} />
@@ -376,7 +376,7 @@ export default function DiaryScreen() {
               {selectedEmoji ? (
                 <Text style={styles.emojiText}>{selectedEmoji}</Text>
               ) : (
-                <Imoticon width={24} height={24} />
+                <EmojiIcon width={24} height={24} />
               )}
             </TouchableOpacity>
           </View>
