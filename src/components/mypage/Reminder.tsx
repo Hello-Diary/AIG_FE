@@ -69,8 +69,8 @@ export default function Reminder() {
     await Notifications.scheduleNotificationAsync({
       identifier: REMINDER_ID,
       content: {
-        title: "📖 읽기 시간 알림",
-        body: "지금 독서 기록을 작성할 시간이에요!",
+        title: "📖 Hello Diary",
+        body: "일기를 작성할 시간이에요!",
         data: { reminder: "reading" },
       },
       trigger: {
