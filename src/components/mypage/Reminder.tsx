@@ -1,4 +1,5 @@
 import c from "@/src/constants/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Constants from "expo-constants";
 import * as Device from "expo-device";
@@ -22,6 +23,10 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// AsyncStorage 키 정의
+const REMINDER_ON_KEY = "@HelloDiary:isReadingReminderOn";
+const REMINDER_TIME_KEY = "@HelloDiary:reminderTime";
+
 export default function Reminder() {
   const [showPicker, setShowPicker] = useState(false);
   const [reminderTime, setReminderTime] = useState<Date>(new Date());
@@ -29,8 +34,29 @@ export default function Reminder() {
 
   const REMINDER_ID = "reading-reminder";
 
-  // 초기화: 푸시 권한 요청, Android 채널 생성
+  // 초기화: 푸시 권한 요청, Android 채널 생성, 저장된 설정 불러오기
   useEffect(() => {
+    // 저장된 설정 불러오기
+    const loadSettings = async () => {
+      try {
+        const reminderOn = await AsyncStorage.getItem(REMINDER_ON_KEY);
+        const reminderTimeStr = await AsyncStorage.getItem(REMINDER_TIME_KEY);
+
+        if (reminderOn !== null) {
+          const isReminderOn = reminderOn === "true";
+          setIsReadingReminderOn(isReminderOn);
+
+          // 알림이 켜져있었고, 저장된 시간이 있다면 불러오기
+          if (isReminderOn && reminderTimeStr !== null) {
+            setReminderTime(new Date(reminderTimeStr));
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load reminder settings.", e);
+      }
+    };
+
+    loadSettings();
     registerForPushNotificationsAsync();
 
     if (Platform.OS === "android") {
@@ -38,16 +64,29 @@ export default function Reminder() {
     }
   }, []);
 
-  // 스위치 토글
-  const toggleSwitch = () => {
+  // 스위치 토글 (AsyncStorage에 켜짐/꺼짐 상태 저장)
+  const toggleSwitch = async () => {
     const newValue = !isReadingReminderOn;
     setIsReadingReminderOn(newValue);
 
-    if (newValue) {
-      scheduleNotification(reminderTime);
-    } else {
-      cancelNotification();
-      setShowPicker(false); // 스위치 끄면 picker 닫기
+    try {
+      // 1. 스위치 상태를 스토리지에 저장
+      await AsyncStorage.setItem(REMINDER_ON_KEY, String(newValue));
+
+      if (newValue) {
+        // 2. 켰을 경우: 현재 시간을 스토리지에 저장하고 알림 예약
+        await AsyncStorage.setItem(
+          REMINDER_TIME_KEY,
+          reminderTime.toISOString()
+        );
+        scheduleNotification(reminderTime);
+      } else {
+        // 3. 껐을 경우: 알림 취소
+        cancelNotification();
+        setShowPicker(false); // 스위치 끄면 picker 닫기
+      }
+    } catch (e) {
+      console.error("Failed to save reminder switch state.", e);
     }
   };
 
@@ -131,11 +170,21 @@ export default function Reminder() {
               onChange={onChangeTime}
             />
 
-            {/* 확인 버튼 */}
+            {/* 확인 버튼 (AsyncStorage에 시간 저장) */}
             <TouchableOpacity
-              onPress={() => {
-                scheduleNotification(reminderTime); // 버튼 눌러야 알람 예약
-                setShowPicker(false); // picker 닫기
+              onPress={async () => {
+                try {
+                  // 1. 새 시간을 스토리지에 저장
+                  await AsyncStorage.setItem(
+                    REMINDER_TIME_KEY,
+                    reminderTime.toISOString()
+                  );
+                  // 2. 알람 예약
+                  scheduleNotification(reminderTime);
+                  setShowPicker(false); // picker 닫기
+                } catch (e) {
+                  console.error("Failed to save reminder time.", e);
+                }
               }}
               style={styles.confirmButton}
             >
@@ -190,7 +239,8 @@ async function registerForPushNotificationsAsync() {
       token = `${e}`;
     }
   } else {
-    alert("Must use physical device for Push Notifications");
+    // 시뮬레이터에서는 알림이 작동하지 않으므로 alert 대신 콘솔 로그
+    console.log("Must use physical device for Push Notifications");
   }
 
   return token;

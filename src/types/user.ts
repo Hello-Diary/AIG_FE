@@ -1,13 +1,12 @@
 export interface UserRequest {
-  email: string;
   name: string;
-  role: string;
+  profile: string;
 }
 
 export interface UserResponse {
   userId: string;
   email: string;
   name: string;
-  role: string;
+  profile: string;
   createdAt: Date;
 }
