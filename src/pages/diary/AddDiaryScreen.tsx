@@ -85,7 +85,7 @@ export default function DiaryScreen() {
   };
 
   const handleDrawTopic = async () => {
-    // const res = await getAllQuestion();
+    // const res = await getAllQuestionApi();
     const res = [
       {
         questionId: "1",
