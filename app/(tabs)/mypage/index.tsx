@@ -1,8 +1,10 @@
+import { getUserDataApi, patchUserDataApi } from "@/src/api/userApi";
 import PlusButton from "@/src/components/diary/AddDiaryButton";
 import ProfileImageModal from "@/src/components/mypage/ProfileImageModal";
 import Reminder from "@/src/components/mypage/Reminder";
 import c from "@/src/constants/colors";
 import { useUserStore } from "@/src/stores/useUserStore";
+import { UserRequest, UserResponse } from "@/src/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
@@ -58,6 +60,38 @@ export default function MyPageScreen() {
   // Profile Image 모달 표시 상태
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const getUserData = async () => {
+    if (!userId) {
+      console.log("Waiting for User ID...");
+      return; // userId가 스토어에서 로드될 때까지 대기
+    }
+
+    try {
+      // GET API 호출
+      const res: UserResponse = await getUserDataApi(userId);
+      // const res = {
+      //   userId: "id",
+      //   name: "처음 가져온 이름",
+      //   email: "처음 가져온 이메일",
+      //   createdAt: "2025-10-10",
+      //   profile: "default",
+      // }; // 임시 데이터
+
+      // 전역 스토어 상태 설정
+      setUserId(res.userId);
+      setName(res.name);
+      setEmail(res.email);
+      setProfileKeyword(res.profile || "default");
+
+      // 로컬 편집 상태 초기화
+      setNewName(res.name);
+      setNewProfileKeyword(res.profile || "default");
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+      // TODO: 사용자에게 에러 피드백
+    }
+  };
+
   const handleEdit = () => {
     setIsEditing(!isEditing);
 
@@ -67,21 +101,28 @@ export default function MyPageScreen() {
   };
 
   // 여기에 async await 추가 & postUserData 함수 호출
-  const handleSubmit = () => {
-    // API 호출 (newName과 newProfileKeyword를 서버로 전송)
-    // const apiResponse = await postUserData(userId, { name: newName, profileKeyword: newProfileKeyword });
-    const updatedUser = { name: newName, profileKeyword: newProfileKeyword }; // 임시 응답
+  const handleSubmit = async () => {
+    if (userId === '') {
+      console.error("User ID is not available for patching.");
+      return;
+    }
 
-    // 전역 스토어 업데이트
-    useUserStore.getState().setName(updatedUser.name);
-    useUserStore
-      .getState()
-      .setProfileKeyword(
-        updatedUser.profileKeyword ? updatedUser.profileKeyword : "default"
-      );
+    const requestData: UserRequest = {
+      name: newName,
+      profile: newProfileKeyword || "default",
+    };
 
-    // 편집 모드 종료
-    setIsEditing(false);
+    try {
+      // PATCH API 호출
+      await patchUserDataApi(userId, requestData);
+      await getUserData();
+      
+      // 편집 모드 종료
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to update user data:", error);
+      // TODO: 사용자에게 에러 피드백 (예: 토스트 메시지)
+    }
   };
 
   const handleLogout = () => {
@@ -103,30 +144,9 @@ export default function MyPageScreen() {
     setIsModalVisible(false);
   };
 
+  // 첫 렌더링
   useEffect(() => {
-    // TODO: GET /api/users/{userId} API 호출하여 사용자 정보 가져오기;
-    const response = {
-      data: {
-        userId: "id",
-        name: "처음 가져온 이름",
-        email: "처음 가져온 이메일",
-        role: "처음 가져온 역할",
-        createdAt: "2025-10-10",
-        profileKeyword: "default",
-      },
-    };
-
-    const userData = response.data;
-
-    // 전역 스토어 상태 설정
-    setUserId(userData.userId);
-    setName(userData.name);
-    setEmail(userData.email);
-    setProfileKeyword(userData.profileKeyword);
-
-    // 로컬 편집 상태 초기화
-    setNewName(userData.name);
-    setNewProfileKeyword(userData.profileKeyword);
+    getUserData();
   }, []);
 
   return (
