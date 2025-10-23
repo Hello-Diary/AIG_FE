@@ -121,46 +121,46 @@ export default function OnboardingScreen() {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        style={{ flex: 1 }}
         onViewableItemsChanged={onViewableItemsChanged} // 뷰 변경 리스너
         viewabilityConfig={viewabilityConfig} // 뷰 설정
         bounces={false} // 끝에서 튕기지 않게
       />
+      <View style={styles.controlsContainer}>
+        <View style={styles.paginationContainer}>
+          {onboardingData.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                // 현재 인덱스와 일치하면 활성 스타일 적용
+                index === currentIndex && styles.dotActive,
+              ]}
+            />
+          ))}
+        </View>
 
-      <View style={styles.paginationContainer}>
-        {onboardingData.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              // 현재 인덱스와 일치하면 활성 스타일 적용
-              index === currentIndex && styles.dotActive,
-            ]}
-          />
-        ))}
-      </View>
-
-      {/* 하단 버튼 영역 */}
-      <View style={styles.buttonContainer}>
-        {/* 다음/완료 버튼 */}
-        <TouchableOpacity
-          onPress={handleNext} // handleNext 함수로 변경
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>
-            {/* 마지막 페이지인지 확인하여 텍스트 변경 */}
-            {currentIndex === LAST_PAGE_INDEX ? "완료" : "다음"}
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.loginContainer}>
-          <Text style={styles.loginText}>이미 계정이 있으신가요? 바로 </Text>
-          <Text
-            style={{ ...styles.loginText, color: c.primary }}
-            onPress={handleCompleteOnboarding}
+        {/* 하단 버튼 영역 */}
+        <View style={styles.buttonContainer}>
+          {/* 다음/완료 버튼 */}
+          <TouchableOpacity
+            onPress={handleNext} // handleNext 함수로 변경
+            style={styles.button}
           >
-            로그인하세요
-          </Text>
+            <Text style={styles.buttonText}>
+              {/* 마지막 페이지인지 확인하여 텍스트 변경 */}
+              {currentIndex === LAST_PAGE_INDEX ? "완료" : "다음"}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>이미 계정이 있으신가요? 바로 </Text>
+            <Text
+              style={{ ...styles.loginText, color: c.primary }}
+              onPress={handleCompleteOnboarding}
+            >
+              로그인하세요
+            </Text>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -174,9 +174,9 @@ const styles = StyleSheet.create({
   },
   page: {
     width: width,
+    height: height * 0.75,
     justifyContent: "center",
     alignItems: "center",
-    paddingBottom: 120, // 버튼 영역 확보
   },
   imageContainer: {
     width: width * 0.8,
@@ -188,14 +188,16 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  controlsContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    gap: 20,
+  },
   paginationContainer: {
-    position: "absolute",
-    bottom: 200, // 하단 버튼(50) + 여백
-    left: 0,
-    right: 0,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 20,
   },
   dot: {
     width: 10,
@@ -208,10 +210,6 @@ const styles = StyleSheet.create({
     backgroundColor: c.gray1,
   },
   buttonContainer: {
-    position: "absolute",
-    bottom: 70,
-    left: 0,
-    right: 0,
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
@@ -220,8 +218,9 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: c.primary,
     paddingVertical: 20,
-    paddingHorizontal: 150,
     borderRadius: 14,
+    width: "100%",
+    alignItems: "center",
   },
   buttonText: {
     color: c.mainwhite,
@@ -231,10 +230,11 @@ const styles = StyleSheet.create({
   skipText: {
     position: "absolute",
     top: 70,
-    right: 20,
+    right: 25,
     color: c.gray2,
     fontSize: 18,
-    fontWeight: 500,
+    fontWeight: "500",
+    zIndex: 10, // FlatList 위에 표시되도록 zIndex 추가
   },
   loginContainer: {
     flexDirection: "row",
@@ -243,6 +243,6 @@ const styles = StyleSheet.create({
   loginText: {
     color: c.bluegray1,
     fontSize: 16,
-    fontWeight: 500,
+    fontWeight: "500",
   },
 });
