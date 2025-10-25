@@ -1,4 +1,5 @@
 export const ENDPOINT = {
-    QUESTION: `/api/questions`,
-    USER: `/api/users`,
+  QUESTION: `/api/questions`,
+  USER: `/api/users`,
+  JOURNAL: `/api/journals`,
 };
