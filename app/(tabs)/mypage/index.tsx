@@ -105,7 +105,6 @@ export default function MyPageScreen() {
     setNewProfileKeyword(profileKeyword);
   };
 
-  // 여기에 async await 추가 & postUserData 함수 호출
   const handleSubmit = async () => {
     if (userId === "") {
       console.error("User ID is not available for patching.");
@@ -134,7 +133,8 @@ export default function MyPageScreen() {
     // 로그아웃 로직
     try {
       const data = { userId: userId };
-      postLogoutApi(data);
+      
+      await postLogoutApi(data);
     } catch (error) {
       console.error("Failed to logout:", error);
     }
@@ -143,7 +143,7 @@ export default function MyPageScreen() {
   const handleDeleteUser = async () => {
     // 탈퇴하기 로직
     try {
-      deleteUserApi(userId);
+      await deleteUserApi(userId);
     } catch (error) {
       console.error("Failed to delete user data:", error);
     }

@@ -24,18 +24,24 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
+import { postJournalApi } from "@/src/api/journalApi";
+import { getAllQuestionApi } from "@/src/api/questionApi";
 import BackButton from "@/src/components/common/BackButton";
 import MoreButton from "@/src/components/common/MoreButton";
 import BottomModal from "@/src/components/diary/BottomModal";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import RewriteModal from "@/src/components/diary/RewriteModal";
 import SaveModal from "@/src/components/diary/SaveModal";
+import { useJournalStore } from "@/src/stores/useJournalStore";
+import { useUserStore } from "@/src/stores/useUserStore";
 import { Question } from "@/src/types/question";
 import { useRouter } from "expo-router";
 
 const inputAccessoryViewID = "diaryInputAccessory";
 
 export default function DiaryScreen() {
+  const { userId } = useUserStore();
+  const { setCurrentJournal } = useJournalStore();
   const [topicQuestion, setTopicQuestion] = useState<Question | null>(null);
 
   const [date, setDate] = useState(new Date());
@@ -57,15 +63,23 @@ export default function DiaryScreen() {
 
   const isButtonEnabled = title.trim() !== "" && description.trim() !== "";
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isButtonEnabled) return;
+    try {
+      const data = {
+        title,
+        content: description,
+        emoji: selectedEmoji,
+        date,
+        questionId: topicQuestion ? topicQuestion.questionId : null,
+      };
 
-    const parameter = {
-      title,
-      description,
-      emoji: selectedEmoji,
-      date,
-    };
+      const res = await postJournalApi(userId, data);
+
+      setCurrentJournal(res);
+    } catch (error) {
+      console.error("Failed to post journal:", error);
+    }
 
     router.push("/feedback");
   };
@@ -85,29 +99,29 @@ export default function DiaryScreen() {
   };
 
   const handleDrawTopic = async () => {
-    // const res = await getAllQuestionApi();
-    const res = [
-      {
-        questionId: "1",
-        text: "question 1",
-        createdAt: new Date(),
-      },
-      {
-        questionId: "2",
-        text: "question 2",
-        createdAt: new Date(),
-      },
-      {
-        questionId: "3",
-        text: "question 3",
-        createdAt: new Date(),
-      },
-      {
-        questionId: "4",
-        text: "question 4",
-        createdAt: new Date(),
-      },
-    ];
+    const res = await getAllQuestionApi();
+    // const res = [
+    //   {
+    //     questionId: "1",
+    //     text: "question 1",
+    //     createdAt: new Date(),
+    //   },
+    //   {
+    //     questionId: "2",
+    //     text: "question 2",
+    //     createdAt: new Date(),
+    //   },
+    //   {
+    //     questionId: "3",
+    //     text: "question 3",
+    //     createdAt: new Date(),
+    //   },
+    //   {
+    //     questionId: "4",
+    //     text: "question 4",
+    //     createdAt: new Date(),
+    //   },
+    // ];
     const randomIndex = Math.floor(Math.random() * res.length);
 
     setTopicQuestion(res[randomIndex]);
@@ -180,22 +194,35 @@ export default function DiaryScreen() {
     setIsRewriteModalVisible(false);
   };
 
-  const handleSaveConfirm = () => {
-    console.log("Diary saved");
+  const handleSaveConfirm = async () => {
     setIsSaveModalVisible(false);
 
     // 저장 후 main으로 가는 로직
+    try {
+      const data = {
+        title,
+        content: description,
+        emoji: selectedEmoji,
+        date,
+        questionId: topicQuestion ? topicQuestion.questionId : null,
+      };
+
+      const res = await postJournalApi(userId, data);
+      setCurrentJournal(res);
+    } catch (error) {
+      console.error("Failed to save journal temporarily:", error);
+    }
+
+    router.push("/");
   };
 
   const handleSaveCancel = () => {
     setIsSaveModalVisible(false);
   };
 
+  // 애초에 add diary screen 이라서 삭제할 때 API 호출 필요 없음!
   const handleDeleteConfirm = () => {
-    console.log("Diary deleted");
     setIsDeleteModalVisible(false);
-
-    // TODO: Journal Delete API 호출
 
     router.push("/");
   };

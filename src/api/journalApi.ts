@@ -18,7 +18,7 @@ export const getJournalApi = async (userId: string, journalId: string) => {
 };
 
 export const postJournalApi = async (userId: string, data: JournalRequest) => {
-  const res = await http.post<JournalRequest>(`${ENDPOINT.JOURNAL}?userId=${userId}`, data);
+  const res = await http.post<JournalRequest, JournalResponse>(`${ENDPOINT.JOURNAL}?userId=${userId}`, data);
   return res;
 };
 
