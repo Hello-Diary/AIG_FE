@@ -12,3 +12,8 @@ export const patchUserDataApi = async (userId: string, data: UserPatchRequest) =
   const res = await http.patch(`${ENDPOINT.USER}/${userId}`, data);
   return res;
 };
+
+export const deleteUserApi = async (userId: string) => {
+  const res = await http.delete(`${ENDPOINT.USER}/${userId}`);
+  return res;
+};
