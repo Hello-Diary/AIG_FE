@@ -1,4 +1,4 @@
-export interface UserRequest {
+export interface UserPatchRequest {
   name: string;
   profile: string;
 }
