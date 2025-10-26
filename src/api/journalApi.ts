@@ -18,7 +18,7 @@ export const getJournalApi = async (userId: string, journalId: string) => {
 };
 
 export const postJournalApi = async (userId: string, data: JournalRequest) => {
-  const res = await http.post(`${ENDPOINT.JOURNAL}?userId=${userId}`, data);
+  const res = await http.post<JournalRequest>(`${ENDPOINT.JOURNAL}?userId=${userId}`, data);
   return res;
 };
 
@@ -34,11 +34,9 @@ export const patchJournalApi = async (
   return res;
 };
 
-export const deleteJournalApi = async (
-  userId: string,
-  journalId: string,
-  data: JournalRequest
-) => {
-  const res = `${ENDPOINT.JOURNAL}/${journalId}?userId=${userId}`;
+export const deleteJournalApi = async (userId: string, journalId: string) => {
+  const res = await http.delete(
+    `${ENDPOINT.JOURNAL}/${journalId}?userId=${userId}`
+  );
   return res;
 };
