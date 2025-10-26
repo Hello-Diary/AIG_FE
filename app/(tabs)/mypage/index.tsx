@@ -1,3 +1,4 @@
+import { postLogoutApi } from "@/src/api/authApi";
 import {
   deleteUserApi,
   getUserDataApi,
@@ -132,7 +133,8 @@ export default function MyPageScreen() {
   const handleLogout = async () => {
     // 로그아웃 로직
     try {
-      console.log("logout");
+      const data = { userId: userId };
+      postLogoutApi(data);
     } catch (error) {
       console.error("Failed to logout:", error);
     }
