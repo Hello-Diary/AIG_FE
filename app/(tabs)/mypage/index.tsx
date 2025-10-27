@@ -6,7 +6,7 @@ import {
 } from "@/src/api/userApi";
 import PlusButton from "@/src/components/diary/AddDiaryButton";
 import ProfileImageModal from "@/src/components/mypage/ProfileImageModal";
-import Reminder from "@/src/components/mypage/Reminder";
+// import Reminder from "@/src/components/mypage/Reminder";
 import c from "@/src/constants/colors";
 import { useUserStore } from "@/src/stores/useUserStore";
 import { UserPatchRequest, UserResponse } from "@/src/types/user";
@@ -189,7 +189,7 @@ export default function MyPageScreen() {
       {/* Reading Reminder Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>읽기 알림</Text>
-        <Reminder />
+        {/* <Reminder /> */}
       </View>
 
       {/* Account Info Section */}

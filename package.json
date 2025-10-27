@@ -27,7 +27,6 @@
     "expo-image": "~3.0.8",
     "expo-linear-gradient": "~15.0.7",
     "expo-linking": "~8.0.8",
-    "expo-notifications": "^0.32.12",
     "expo-permissions": "^14.4.0",
     "expo-router": "~6.0.3",
     "expo-splash-screen": "~31.0.10",
@@ -59,5 +58,6 @@
     "react-native-svg-transformer": "^1.5.1",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
