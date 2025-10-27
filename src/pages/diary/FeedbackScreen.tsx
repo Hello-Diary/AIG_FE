@@ -1,8 +1,11 @@
+import { deleteJournalApi } from "@/src/api/journalApi";
 import HomeButton from "@/src/components/common/HomeButton";
 import MoreButton from "@/src/components/common/MoreButton";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import MoveModal from "@/src/components/diary/MoveModal";
 import c from "@/src/constants/colors";
+import { useJournalStore } from "@/src/stores/useJournalStore";
+import { useUserStore } from "@/src/stores/useUserStore";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
@@ -16,11 +19,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FeedbackScreen() {
+  const { userId } = useUserStore();
+  const { currentJournal } = useJournalStore();
+
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isDestModalVisible, setIsDestModalVisible] = useState<boolean>(false);
   // const [isListModalVisible, setIsListModalVisible] = useState<boolean>(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] =
-    useState<boolean>(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
 
@@ -89,11 +94,11 @@ export default function FeedbackScreen() {
   const handleDestinationConfirm = () => {
     setIsDestModalVisible(false);
     router.push("/dictionary");
-  }
+  };
 
   const handleDestinationCancel = () => {
     setIsDestModalVisible(false);
-  }
+  };
 
   // const handleListConfirm = () => {
   //   setIsListModalVisible(false);
@@ -104,10 +109,18 @@ export default function FeedbackScreen() {
   //   setIsListModalVisible(false);
   // }
 
-  const handleDeleteConfirm = () => {
-    console.log("Diary deleted");
+  const handleDeleteConfirm = async () => {
     setIsDeleteModalVisible(false);
-    // 삭제 후 이전 화면으로 이동하는 로직 추가
+
+    try {
+      if (currentJournal) {
+        await deleteJournalApi(userId, currentJournal.journalId);
+      }
+    } catch (error) {
+      console.error("Failed to delete journal:", error);
+    }
+
+    router.push("/");
   };
 
   const handleDeleteCancel = () => {

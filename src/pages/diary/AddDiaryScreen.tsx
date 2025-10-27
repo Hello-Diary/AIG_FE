@@ -41,10 +41,10 @@ const inputAccessoryViewID = "diaryInputAccessory";
 
 export default function DiaryScreen() {
   const { userId } = useUserStore();
-  const { setCurrentJournal } = useJournalStore();
+  const { diaryDate, setCurrentJournal } = useJournalStore();
   const [topicQuestion, setTopicQuestion] = useState<Question | null>(null);
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(diaryDate);
   const [tempDate, setTempDate] = useState(date);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
