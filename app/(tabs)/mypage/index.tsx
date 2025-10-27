@@ -1,10 +1,15 @@
-import { getUserDataApi, patchUserDataApi } from "@/src/api/userApi";
+import { postLogoutApi } from "@/src/api/authApi";
+import {
+  deleteUserApi,
+  getUserDataApi,
+  patchUserDataApi,
+} from "@/src/api/userApi";
 import PlusButton from "@/src/components/diary/AddDiaryButton";
 import ProfileImageModal from "@/src/components/mypage/ProfileImageModal";
 import Reminder from "@/src/components/mypage/Reminder";
 import c from "@/src/constants/colors";
 import { useUserStore } from "@/src/stores/useUserStore";
-import { UserRequest, UserResponse } from "@/src/types/user";
+import { UserPatchRequest, UserResponse } from "@/src/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
@@ -100,14 +105,13 @@ export default function MyPageScreen() {
     setNewProfileKeyword(profileKeyword);
   };
 
-  // 여기에 async await 추가 & postUserData 함수 호출
   const handleSubmit = async () => {
-    if (userId === '') {
+    if (userId === "") {
       console.error("User ID is not available for patching.");
       return;
     }
 
-    const requestData: UserRequest = {
+    const requestData: UserPatchRequest = {
       name: newName,
       profile: newProfileKeyword || "default",
     };
@@ -116,7 +120,7 @@ export default function MyPageScreen() {
       // PATCH API 호출
       await patchUserDataApi(userId, requestData);
       await getUserData();
-      
+
       // 편집 모드 종료
       setIsEditing(false);
     } catch (error) {
@@ -125,14 +129,24 @@ export default function MyPageScreen() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // 로그아웃 로직
-    console.log("로그아웃");
+    try {
+      const data = { userId: userId };
+      
+      await postLogoutApi(data);
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
   };
 
-  const handleWithdraw = () => {
+  const handleDeleteUser = async () => {
     // 탈퇴하기 로직
-    console.log("탈퇴하기");
+    try {
+      await deleteUserApi(userId);
+    } catch (error) {
+      console.error("Failed to delete user data:", error);
+    }
   };
 
   const handleModalConfirm = (selectedKey: string) => {
@@ -261,7 +275,7 @@ export default function MyPageScreen() {
         {/* 탈퇴하기 버튼 */}
         <TouchableOpacity
           style={styles.actionItem}
-          onPress={handleWithdraw}
+          onPress={handleDeleteUser}
           activeOpacity={0.7}
         >
           <Text style={styles.actionText}>탈퇴하기</Text>
