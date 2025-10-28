@@ -14,4 +14,5 @@ export interface JournalResponse {
   emoji: string | null;
   date: Date;
   submittedAt: Date;
+  isSuggested: boolean;
 }

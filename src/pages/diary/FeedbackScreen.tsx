@@ -42,7 +42,9 @@ export default function FeedbackScreen() {
 
   const [originalDiary, setOriginalDiary] = useState<JournalResponse>();
   const [feedback, setFeedback] = useState<GrammarResponse>();
-  const [processedContent, setProcessedContent] = useState<ProcessedSegment[]>([]);
+  const [processedContent, setProcessedContent] = useState<ProcessedSegment[]>(
+    []
+  );
 
   const router = useRouter();
   const slideAnim = useRef(new Animated.Value(280)).current;
@@ -85,7 +87,7 @@ export default function FeedbackScreen() {
       console.error("Failed to get grammar feedback:", error);
     }
   };
-  
+
   // 원본 텍스트와 수정 정보를 결합하는 헬퍼 함수
   const processFeedback = (
     originalContent: string,
@@ -191,6 +193,25 @@ export default function FeedbackScreen() {
 
   const handleDeleteCancel = () => {
     setIsDeleteModalVisible(false);
+  };
+
+  const handleSuggestion = () => {
+    if (!originalDiary) {
+      console.log("No original diary rendered");
+      return;
+    }
+
+    if (originalDiary.isSuggested) {
+      try {
+      } catch (error) {
+        console.error("Failed to get new AI suggestion:", error);
+      }
+    } else {
+      try {
+      } catch (error) {
+        console.error("Failed to get previous AI suggestion:", error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -377,7 +398,10 @@ export default function FeedbackScreen() {
 
       {/* 하단 버튼 */}
       <View style={styles.bottomFixedContainer}>
-        <TouchableOpacity style={styles.footerButton}>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={handleSuggestion}
+        >
           <View style={styles.footerButtonUnderline}>
             <Text style={styles.footerButtonText}>AI 추천 표현 보기</Text>
           </View>
