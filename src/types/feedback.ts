@@ -9,6 +9,10 @@ export interface Edit {
   errDesc: string;
 }
 
+export interface GrammarRequest {
+  text: string;
+}
+
 export interface GrammarResponse {
   correction: string;
   status: number;

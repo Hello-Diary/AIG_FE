@@ -1,4 +1,5 @@
-import { deleteJournalApi } from "@/src/api/journalApi";
+import { getGrammarCheckApi } from "@/src/api/grammarApi";
+import { deleteJournalApi, getJournalApi } from "@/src/api/journalApi";
 import HomeButton from "@/src/components/common/HomeButton";
 import MoreButton from "@/src/components/common/MoreButton";
 import DeleteModal from "@/src/components/diary/DeleteModal";
@@ -6,8 +7,10 @@ import MoveModal from "@/src/components/diary/MoveModal";
 import c from "@/src/constants/colors";
 import { useJournalStore } from "@/src/stores/useJournalStore";
 import { useUserStore } from "@/src/stores/useUserStore";
+import { GrammarResponse } from "@/src/types/feedback";
+import { JournalResponse } from "@/src/types/journal";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   ScrollView,
@@ -20,23 +23,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FeedbackScreen() {
   const { userId } = useUserStore();
-  const { currentJournal } = useJournalStore();
+  const { currentJournalId } = useJournalStore();
 
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isDestModalVisible, setIsDestModalVisible] = useState<boolean>(false);
   // const [isListModalVisible, setIsListModalVisible] = useState<boolean>(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState<boolean>(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] =
+    useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
+
+  const [originalDiary, setOriginalDiary] = useState<JournalResponse>();
+  const [feedback, setFeedback] = useState<GrammarResponse>();
 
   const router = useRouter();
   const slideAnim = useRef(new Animated.Value(280)).current;
 
-  const data = {
-    date: "2025.02.12",
-    originalDiary:
-      "Today I waked up late and missed the school bus. I runned to the bus stop but the bus already gone. My mom was little angry because I was not ready. At school, I forget my homework at home. It was not best day for me.",
-  };
   const correctedDiary = [
     { text: "Today I ", key: "1" },
     {
@@ -67,6 +69,58 @@ export default function FeedbackScreen() {
     },
     { text: " my homework at home. It was not the best day for me.", key: "7" },
   ];
+
+  const getOriginalDiary = async () => {
+    if (!currentJournalId) {
+      console.log("No journal ID found");
+      return;
+    }
+
+    try {
+      const res = await getJournalApi(userId, currentJournalId);
+
+      setOriginalDiary(res);
+    } catch (error) {
+      console.error("Failed to get original diary:", error);
+    }
+  };
+
+  const getFeedbackDiary = async () => {
+    if (!currentJournalId) { 
+      console.log("No journal ID found");
+      return;
+    }
+    if (!originalDiary) {
+      console.log("Original diary not rendered");
+      return;
+    }
+
+    try {
+      const data = {
+        text: originalDiary.content,
+      }
+
+      const res = await getGrammarCheckApi(data);
+      
+      setFeedback(res);
+    } catch (error) {
+      console.error("Failed to get grammar feedback:", error);
+    }
+  };
+
+  const formatDate = (d: Date | undefined) => {
+    if (!d) {
+      return "날짜 없음";
+    }
+
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(
+      2,
+      "0"
+    )}`;
+  };
 
   const toggleMenu = () => {
     const toValue = isMenuOpen ? 280 : 0;
@@ -113,8 +167,8 @@ export default function FeedbackScreen() {
     setIsDeleteModalVisible(false);
 
     try {
-      if (currentJournal) {
-        await deleteJournalApi(userId, currentJournal.journalId);
+      if (currentJournalId !== "") {
+        await deleteJournalApi(userId, currentJournalId);
       }
     } catch (error) {
       console.error("Failed to delete journal:", error);
@@ -126,6 +180,10 @@ export default function FeedbackScreen() {
   const handleDeleteCancel = () => {
     setIsDeleteModalVisible(false);
   };
+
+  useEffect(() => {
+    getOriginalDiary();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
@@ -199,7 +257,7 @@ export default function FeedbackScreen() {
         {/* Header */}
         <View style={styles.header}>
           <HomeButton />
-          <Text style={styles.date}>{data.date}</Text>
+          <Text style={styles.date}>{formatDate(originalDiary?.date)}</Text>
           <MoreButton toggleMenu={toggleMenu} />
         </View>
 
@@ -240,14 +298,14 @@ export default function FeedbackScreen() {
         <View style={styles.scroll}>
           <View style={styles.card}>
             <View style={styles.titleRow}>
-              <Text style={styles.title}>missed the bus</Text>
+              <Text style={styles.title}>{originalDiary?.title}</Text>
               <View style={styles.emoji}>
-                <Text>😱</Text>
+                <Text>{originalDiary?.emoji}</Text>
               </View>
             </View>
 
             {selectedTab === "my" ? (
-              <Text style={styles.content}>{data.originalDiary}</Text>
+              <Text style={styles.content}>{originalDiary?.content}</Text>
             ) : (
               <Text style={styles.content}>
                 {correctedDiary.map((item) => {
