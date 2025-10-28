@@ -42,19 +42,16 @@ export default function FeedbackScreen() {
 
   const [originalDiary, setOriginalDiary] = useState<JournalResponse>();
   const [feedback, setFeedback] = useState<GrammarResponse>();
-  // [추가] 가공된 컨텐츠 상태
-  const [processedContent, setProcessedContent] = useState<ProcessedSegment[]>(
-    []
-  );
+  const [processedContent, setProcessedContent] = useState<ProcessedSegment[]>([]);
 
   const router = useRouter();
   const slideAnim = useRef(new Animated.Value(280)).current;
 
   const getOriginalDiary = async () => {
-    // if (!currentJournalId) {
-    //   console.log("No journal ID found");
-    //   return;
-    // }
+    if (!currentJournalId) {
+      console.log("No journal ID found");
+      return;
+    }
 
     try {
       const res = await getJournalApi(userId, currentJournalId);
