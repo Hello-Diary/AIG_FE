@@ -3,4 +3,6 @@ export const ENDPOINT = {
   USER: `/api/users`,
   JOURNAL: `/api/journals`,
   AUTH: `/api/auth`,
+  GRAMMAR: `/api/grammar`,
+  SUGGESTION: `/api/suggestions`,
 };

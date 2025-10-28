@@ -1,4 +1,3 @@
-import { JournalResponse } from "./journal";
 
 export interface Edit {
   start: number;
@@ -8,12 +7,6 @@ export interface Edit {
   errCat: string;
   errType: string;
   errDesc: string;
-}
-
-export interface GrammarRequest {
-  text: string;
-  apiKey: string;
-  language: string;
 }
 
 export interface GrammarResponse {
@@ -34,6 +27,6 @@ export interface SuggestionResponse {
   naturalExample: string;
   appliedSentence: string;
   isFlashcard: boolean;
-  journal: JournalResponse;
+  journalId: string;
   createdAt: Date;
 }
