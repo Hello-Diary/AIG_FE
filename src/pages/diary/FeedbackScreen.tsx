@@ -6,6 +6,7 @@ import DeleteModal from "@/src/components/diary/DeleteModal";
 import MoveModal from "@/src/components/diary/MoveModal";
 import c from "@/src/constants/colors";
 import { useJournalStore } from "@/src/stores/useJournalStore";
+import { useSuggestionStore } from "@/src/stores/useSuggestionStore";
 import { useUserStore } from "@/src/stores/useUserStore";
 import { Edit, GrammarRequest, GrammarResponse } from "@/src/types/feedback";
 import { JournalResponse } from "@/src/types/journal";
@@ -32,6 +33,7 @@ type ProcessedSegment = {
 export default function FeedbackScreen() {
   const { userId } = useUserStore();
   const { currentJournalId } = useJournalStore();
+  const { setIsSuggested } = useSuggestionStore();
 
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isDestModalVisible, setIsDestModalVisible] = useState<boolean>(false);
@@ -59,6 +61,7 @@ export default function FeedbackScreen() {
       const res = await getJournalApi(userId, currentJournalId);
 
       setOriginalDiary(res);
+      setIsSuggested(res.isSuggested);
     } catch (error) {
       console.error("Failed to get original diary:", error);
     }
@@ -201,7 +204,7 @@ export default function FeedbackScreen() {
       return;
     }
 
-    router.push('/');
+    // TODO: push to suggestion page and suggestion page에서는 isSuggested에 따라 API 다르게 호출
   };
 
   useEffect(() => {
