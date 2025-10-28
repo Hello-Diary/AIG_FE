@@ -1,4 +1,4 @@
-import { getGrammarCheckApi } from "@/src/api/grammarApi";
+import { postGrammarCheckApi } from "@/src/api/grammarApi";
 import { deleteJournalApi, getJournalApi } from "@/src/api/journalApi";
 import HomeButton from "@/src/components/common/HomeButton";
 import MoreButton from "@/src/components/common/MoreButton";
@@ -80,7 +80,7 @@ export default function FeedbackScreen() {
         text: originalDiary.content,
       };
 
-      const res = await getGrammarCheckApi(data);
+      const res = await postGrammarCheckApi(data);
 
       setFeedback(res);
     } catch (error) {
@@ -201,17 +201,7 @@ export default function FeedbackScreen() {
       return;
     }
 
-    if (originalDiary.isSuggested) {
-      try {
-      } catch (error) {
-        console.error("Failed to get new AI suggestion:", error);
-      }
-    } else {
-      try {
-      } catch (error) {
-        console.error("Failed to get previous AI suggestion:", error);
-      }
-    }
+    router.push('/');
   };
 
   useEffect(() => {
