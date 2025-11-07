@@ -1,6 +1,7 @@
-import BackButton from '@/src/components/common/BackButton';
+import BackButton from '@/src/components/BackButton';
 
 import { Stack } from 'expo-router';
+import { StyleSheet } from 'react-native';
 
 export default function DictionaryLayout() {
   return (
@@ -15,6 +16,18 @@ export default function DictionaryLayout() {
           ),
         }}
       />
+      {/* <Stack.Screen
+        name="add"
+        options={{
+          title: '단어 추가',
+          headerStyle: styles.header,
+          headerTitleStyle: styles.title,
+          headerShadowVisible: false,
+        }}
+      /> */}
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+});
