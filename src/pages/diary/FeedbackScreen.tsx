@@ -204,7 +204,7 @@ export default function FeedbackScreen() {
       return;
     }
 
-    // TODO: push to suggestion page and suggestion page에서는 isSuggested에 따라 API 다르게 호출
+    router.push(`/suggestion`);
   };
 
   useEffect(() => {

@@ -74,11 +74,11 @@ export default function DiaryScreen() {
         questionId: topicQuestion ? topicQuestion.questionId : null,
       };
 
-      // const res = await postJournalApi(userId, data);
+      const res = await postJournalApi(userId, data);
 
-      // setCurrentJournalId(res.journalId);
+      setCurrentJournalId(res.journalId);
 
-      // router.push('/feedback');
+      router.push('/feedback');
     } catch (error) {
       console.error("Failed to post journal:", error);
     }
