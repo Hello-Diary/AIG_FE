@@ -1,4 +1,4 @@
-import { GrammarRequest, GrammarResponse } from "../types/feedback";
+import { GrammarRequest, GrammarResponse } from "../types/grammar";
 import { ENDPOINT } from "./endPoint";
 import { http } from "./http";
 

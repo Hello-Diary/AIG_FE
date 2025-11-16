@@ -4,5 +4,6 @@ export const ENDPOINT = {
   JOURNAL: `/api/journals`,
   AUTH: `/api/auth`,
   GRAMMAR: `/api/grammar`,
-  SUGGESTION: `/api/suggestions`,
+  FEEDBACK: `/api/feedbacks`,
+  DICTIONARY: `/api/flashcards`,
 };

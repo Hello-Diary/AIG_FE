@@ -1,8 +1,14 @@
-import c from "@/src/constants/colors";
-import { IdiomData } from "@/src/types/dictionary";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { JSX, useState } from "react";
 import {
+  batchToggleFlashcardsApi,
+  getSavedFlashcardsApi,
+} from "@/src/api/flashcardApi";
+import c from "@/src/constants/colors";
+import { FlashcardResponse, IdiomSuggestion } from "@/src/types/dictionary";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useIsFocused } from "@react-navigation/native";
+import { JSX, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,93 +16,153 @@ import {
   View,
 } from "react-native";
 
+export const MOCK_DICTIONARY_DATA: FlashcardResponse[] = [
+  {
+    flashcardId: "fc-id-001",
+    front: "Break a leg",
+    back: "행운을 빌어!",
+    tags: ["common", "performance"],
+    userId: "user-123",
+    journalId: "journal-abc",
+    feedbackId: "feedback-xyz-1",
+    createdAt: new Date("2025-11-15T10:30:00"),
+  },
+  {
+    flashcardId: "fc-id-002",
+    front: "Bite the bullet",
+    back: "이를 악물고 참다",
+    tags: ["difficulty", "common"],
+    userId: "user-123",
+    journalId: "journal-abc",
+    feedbackId: "feedback-xyz-2",
+    createdAt: new Date("2025-11-14T14:20:00"),
+  },
+  {
+    flashcardId: "fc-id-003",
+    front: "Spill the beans",
+    back: "비밀을 누설하다",
+    tags: ["secret", "social"],
+    userId: "user-123",
+    journalId: "journal-def",
+    feedbackId: "feedback-xyz-3",
+    createdAt: new Date("2025-11-13T09:05:00"),
+  },
+  {
+    flashcardId: "fc-id-004",
+    front: "Once in a blue moon",
+    back: "극히 드물게",
+    tags: ["frequency", "rare"],
+    userId: "user-123",
+    journalId: "journal-ghi",
+    feedbackId: "feedback-xyz-4",
+    createdAt: new Date("2025-11-12T18:45:00"),
+  },
+];
+
 export default function Dictionary() {
-  // mock data
-  const idiomData: IdiomData[] = [
-    {
-      id: 1,
-      english: "Have a blast",
-      korean: "아주 재미있고 즐거운 시간을 보내다",
-      example: "We had a blast playing soccer at the park yesterday",
-      usage: ["발고 친근한 구어체", "긍정적인 분위기에서만 사용"],
-      variations: [
-        "had a blast at + 장소/행사",
-        "have a blast with + 사람/활동",
-        "감탄형: That was a blast!",
-      ],
-    },
-    {
-      id: 2,
-      english: "call it a day",
-      korean: "하루 일과를 마치다, 그만두다",
-      example: "Let's call it a day and continue tomorrow",
-      usage: ["업무나 활동을 끝낼 때 사용", "비공식적 상황에서 주로 사용"],
-      variations: [
-        "call it a night (밤에 사용)",
-        "let's call it a day",
-        "I think we should call it a day",
-      ],
-    },
-    {
-      id: 3,
-      english: "under the weather",
-      korean: "몸이 좋지 않은, 컨디션이 안 좋은",
-      example: "I'm feeling under the weather today",
-      usage: ["가벼운 병이나 불편함 표현", "정중한 표현"],
-      variations: [
-        "feeling under the weather",
-        "a bit under the weather",
-        "slightly under the weather",
-      ],
-    },
-    {
-      id: 4,
-      english: "cost an arm and a leg",
-      korean: "매우 비싸다",
-      example: "That car costs an arm and a leg",
-      usage: ["과장된 표현", "비공식적 대화에서 사용"],
-      variations: [
-        "costs an arm and a leg",
-        "cost me an arm and a leg",
-        "worth an arm and a leg",
-      ],
-    },
-    {
-      id: 5,
-      english: "once in a blue moon",
-      korean: "아주 드물게, 거의 없는",
-      example: "I only see him once in a blue moon",
-      usage: ["매우 드문 일 표현", "부정적 뉘앙스 포함"],
-      variations: [
-        "happens once in a blue moon",
-        "see/meet once in a blue moon",
-        "only once in a blue moon",
-      ],
-    },
-  ];
+  const [suggestions, setSuggestions] = useState<FlashcardResponse[]>(MOCK_DICTIONARY_DATA);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedIdiom, setSelectedIdiom] = useState<IdiomSuggestion | null>(
+    null
+  );
+  // 선택된 항목들을 추적하는 state
+  const [toggledIdioms, setToggledIdioms] = useState<Record<string, boolean>>(
+    {}
+  );
 
-  const [selectedIdiom, setSelectedIdiom] = useState<IdiomData | null>(null);
+  const isFocused = useIsFocused();
 
-  const handleIdiomPress = (idiom: IdiomData): void => {
-    if (selectedIdiom?.id === idiom.id) {
+  useEffect(() => {
+    if (isFocused) {
+      const fetchDictionary = async () => {
+        setIsLoading(true);
+        try {
+          const data = await getSavedFlashcardsApi();
+
+          setSuggestions(data);
+        } catch (error) {
+          console.error("Failed to fetch dictionary:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchDictionary();
+    }
+  }, [isFocused]);
+
+  // 확장/축소 핸들러 (기존 로직)
+  const handleIdiomPress = (idiom: IdiomSuggestion): void => {
+    if (selectedIdiom?.idiom === idiom.idiom) {
       setSelectedIdiom(null);
     } else {
       setSelectedIdiom(idiom);
     }
   };
 
-  const renderIdiomItem = (idiom: IdiomData, index: number): JSX.Element => {
-    const isExpanded: boolean = selectedIdiom?.id === idiom.id;
+  // 다이아몬드 토글 핸들러
+  const handleToggleIdiom = (idiom: string) => {
+    setToggledIdioms((prev) => ({
+      ...prev,
+      [idiom]: !prev[idiom],
+    }));
+  };
+
+  // Batch 업데이트 핸들러
+  const handleUpdateDictionary = async () => {
+    const itemsToUpdate = Object.keys(toggledIdioms)
+      .filter((id) => toggledIdioms[id]) // 토글된 항목만 필터링
+      .map((id) => ({
+        suggestionId: id, // 컴포넌트의 flashcardId를 API의 suggestionId로 매핑
+        isFlashcard: false, // 사전에서 토글 = 제거(false)로 간주
+      }));
+
+    if (itemsToUpdate.length === 0) return;
+
+    try {
+      // 수정된 API 호출
+      const res = await batchToggleFlashcardsApi({ suggestions: itemsToUpdate });
+
+      // 성공 시
+      setSuggestions(res);
+      setToggledIdioms({}); // 토글 상태 초기화
+    } catch (error) {
+      console.error("Failed to batch update:", error);
+    }
+  };
+
+  // 하나라도 토글되었는지 확인
+  const isAnyToggled = Object.values(toggledIdioms).some(Boolean);
+
+  const renderIdiomItem = (
+    idiom: IdiomSuggestion,
+    index: number
+  ): JSX.Element => {
+    const isExpanded: boolean = selectedIdiom?.idiom === idiom.idiom;
+    const isToggled: boolean = !!toggledIdioms[idiom.id];
 
     return (
-      <View key={idiom.id || `${idiom.english}-${index}`}>
+      <View key={`${idiom.idiom}-${index}`}>
         <TouchableOpacity
           style={styles.idiomItem}
-          onPress={() => handleIdiomPress(idiom)}
+          onPress={() => handleIdiomPress(idiom)} // 본문 클릭 시 확장
+          activeOpacity={0.8}
         >
           <View style={styles.idiomHeader}>
-            <View style={styles.diamond} />
-            <Text style={styles.idiomText}>{idiom.english}</Text>
+            {/* 다이아몬드 토글 버튼 */}
+            <TouchableOpacity
+              onPress={() => handleToggleIdiom(idiom.id)}
+              style={styles.diamondButton}
+            >
+              <View
+                style={[styles.diamond, isToggled && styles.diamondToggled]}
+              />
+            </TouchableOpacity>
+
+            {/* 숙어 텍스트 */}
+            <Text style={styles.idiomText}>{idiom.idiom}</Text>
+
+            {/* 확장 아이콘 */}
             <Ionicons
               name={isExpanded ? "chevron-up" : "chevron-down"}
               size={20}
@@ -105,23 +171,14 @@ export default function Dictionary() {
           </View>
           {isExpanded && (
             <View style={styles.expandedContent}>
-              <Text style={styles.koreanMeaning}>{idiom.korean}</Text>
-              <Text style={styles.example}>{idiom.example}</Text>
-
+              <Text style={styles.koreanMeaning}>{idiom.Meaning}</Text>
+              <Text style={styles.example}>예: {idiom.naturalExample}</Text>
+              <Text style={styles.example}>적용: {idiom.appliedSentence}</Text>
               <View style={styles.detailsBox}>
-                <Text style={styles.sectionTitle}>뉘앙스</Text>
-                {idiom.usage.map((usage, idx) => (
-                  <Text key={idx} style={styles.bulletPoint}>
-                    • {usage}
-                  </Text>
-                ))}
-
-                <Text style={styles.sectionTitle}>자주 쓰는 조합</Text>
-                {idiom.variations.map((variation, idx) => (
-                  <Text key={idx} style={styles.bulletPoint}>
-                    • {variation}
-                  </Text>
-                ))}
+                <Text style={styles.sectionTitle}>맥락 (Context)</Text>
+                <Text style={styles.bulletPoint}>• {idiom.context}</Text>
+                <Text style={styles.sectionTitle}>유래 (Origin)</Text>
+                <Text style={styles.bulletPoint}>• {idiom.origin}</Text>
               </View>
             </View>
           )}
@@ -130,17 +187,63 @@ export default function Dictionary() {
     );
   };
 
-  // TODO: API 명세 완료되면 데이터 받아오는 걸로 교체
-  const displayData = idiomData;
-  
-  // mock data 반복 - id 중복으로 인해 same key ERROR 발생함
-  // const displayData = idiomData.concat(idiomData).concat(idiomData);
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={c.primary} />
+      </View>
+    );
+  }
+
+  if (suggestions.length === 0 && !isLoading) {
+    // 로딩이 끝난 후 확인
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.emptyText}>저장된 표현이 없습니다.</Text>
+        <Text style={styles.emptySubText}>
+          AI 추천 표현에서 사전에 저장해보세요!
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {displayData.map((idiom, index) => renderIdiomItem(idiom, index))}
+        {/* TODO: suggestion이든 flashcard response이든 타입 맞춰서 넣기 */}
+        {suggestions.map((idiom, index) =>
+          renderIdiomItem(
+            {
+              id: idiom.flashcardId,
+              idiom: idiom.front,
+              Meaning: idiom.back,
+              naturalExample: "",
+              appliedSentence: "",
+              context: "",
+              origin: "",
+            },
+            index
+          )
+        )}
       </ScrollView>
+
+      {/* 하단 버튼 추가 */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.updateButton, !isAnyToggled && styles.disabledButton]}
+          disabled={!isAnyToggled}
+          onPress={handleUpdateDictionary}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              !isAnyToggled && styles.disabledButtonText,
+            ]}
+          >
+            나의 사전 수정하기
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -153,9 +256,24 @@ const styles = StyleSheet.create({
     backgroundColor: c.bg || "#fff",
   },
   content: {
-    flex: 1,
-    height: "100%",
+    flex: 1, // 스크롤 영역이 버튼을 제외한 나머지 공간을 채우도록
+    height: "100%", // 이 속성은 flex: 1과 함께 사용될 때 불필요할 수 있음
     paddingHorizontal: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  emptySubText: {
+    fontSize: 14,
+    color: "#888",
+    marginTop: 8,
   },
   horizontalLine: {
     height: 1,
@@ -178,19 +296,29 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   idiomHeader: {
+    width: "100%", // 헤더가 꽉 차도록
     flexDirection: "row",
     alignItems: "center",
   },
+  // 다이아몬드 버튼 (터치 영역 확보)
+  diamondButton: {
+    padding: 10, // 터치 영역 (Hit Slop)
+    margin: -10, // 레이아웃 유지를 위해 패딩 상쇄
+    marginRight: 5, // 텍스트와의 간격 (15 - 10)
+  },
   diamond: {
-    width: 8,
-    height: 8,
+    width: 12,
+    height: 12,
     backgroundColor: c.primary,
     transform: [{ rotate: "45deg" }],
     marginRight: 15,
   },
+  // 토글된 다이아몬드 스타일
+  diamondToggled: {
+    backgroundColor: c.button,
+  },
   idiomText: {
-    flex: 1,
-    textAlign: "center",
+    flex: 1, // 텍스트가 남은 공간을 채움
     fontSize: 16,
     color: "#000",
     fontWeight: "400",
@@ -216,6 +344,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     marginBottom: 15,
+    paddingHorizontal: 10,
+    fontStyle: "italic",
   },
   detailsBox: {
     width: "100%",
@@ -236,5 +366,29 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 4,
     paddingLeft: 5,
+    lineHeight: 18,
+  },
+  // --- 버튼 스타일 ---
+  buttonContainer: {
+    padding: 20,
+    paddingTop: 10,
+    backgroundColor: c.bg,
+  },
+  updateButton: {
+    backgroundColor: c.primary,
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
+  },
+  buttonText: {
+    color: c.mainwhite,
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  disabledButtonText: {
+    color: "#888",
   },
 });

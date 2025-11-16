@@ -8,7 +8,7 @@ import c from "@/src/constants/colors";
 import { useJournalStore } from "@/src/stores/useJournalStore";
 import { useSuggestionStore } from "@/src/stores/useSuggestionStore";
 import { useUserStore } from "@/src/stores/useUserStore";
-import { Edit, GrammarRequest, GrammarResponse } from "@/src/types/feedback";
+import { Edit, GrammarRequest, GrammarResponse } from "@/src/types/grammar";
 import { JournalResponse } from "@/src/types/journal";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -41,8 +41,7 @@ export default function FeedbackScreen() {
     useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
-
-  const [originalDiary, setOriginalDiary] = useState<JournalResponse>();
+  const [originalDiary, setOriginalDiary] = useState<JournalResponse>({} as JournalResponse);
   const [feedback, setFeedback] = useState<GrammarResponse>();
   const [processedContent, setProcessedContent] = useState<ProcessedSegment[]>(
     []
@@ -59,9 +58,8 @@ export default function FeedbackScreen() {
 
     try {
       const res = await getJournalApi(userId, currentJournalId);
-
       setOriginalDiary(res);
-      setIsSuggested(res.isSuggested);
+      setIsSuggested(res.isSuggested);  // isSuggested 전역 상태에 저장
     } catch (error) {
       console.error("Failed to get original diary:", error);
     }
@@ -84,7 +82,6 @@ export default function FeedbackScreen() {
       };
 
       const res = await postGrammarCheckApi(data);
-
       setFeedback(res);
     } catch (error) {
       console.error("Failed to get grammar feedback:", error);
@@ -204,7 +201,7 @@ export default function FeedbackScreen() {
       return;
     }
 
-    router.push(`/suggestion`);
+    router.push("/suggestion");
   };
 
   useEffect(() => {
@@ -371,7 +368,8 @@ export default function FeedbackScreen() {
               ⓘ 교정된 단어를 클릭하여 설명을 확인하세요.
             </Text>
           )}
-          {/* [수정] processedContent.find로 변경 */}
+
+          {/* processedContent.find로 변경 */}
           {selectedTab === "ai" && selectedWord && (
             <View style={styles.explainBox}>
               <Text style={styles.explainTitle}>

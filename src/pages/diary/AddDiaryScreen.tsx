@@ -77,8 +77,6 @@ export default function DiaryScreen() {
       const res = await postJournalApi(userId, data);
 
       setCurrentJournalId(res.journalId);
-
-      router.push('/feedback');
     } catch (error) {
       console.error("Failed to post journal:", error);
     }
@@ -102,7 +100,6 @@ export default function DiaryScreen() {
 
   const handleDrawTopic = async () => {
     const res = await getAllQuestionApi();
-    
     const randomIndex = Math.floor(Math.random() * res.length);
 
     setTopicQuestion(res[randomIndex]);
@@ -127,6 +124,7 @@ export default function DiaryScreen() {
     setPickerVisible(false);
   };
 
+  // TODO: formatdate method utils로 분리하기
   const formatDate = (d: Date) => {
     const year = d.getFullYear();
     const month = d.getMonth() + 1;
@@ -189,6 +187,7 @@ export default function DiaryScreen() {
       };
 
       const res = await postJournalApi(userId, data);
+      setCurrentJournalId(res.journalId);
     } catch (error) {
       console.error("Failed to save journal temporarily:", error);
     }

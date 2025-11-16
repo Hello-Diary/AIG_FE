@@ -8,7 +8,7 @@ interface JournalState {
 }
 
 export const useJournalStore = create<JournalState>((set) => ({
-  currentJournalId: "",
+  currentJournalId: "0",
   diaryDate: new Date(),
 
   setCurrentJournalId: (currentJournalId: string) => set({ currentJournalId }),
