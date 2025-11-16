@@ -1,3 +1,4 @@
+import c from "@/src/constants/colors";
 import React from "react";
 import {
   Modal,
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#DFE1EE",
   },
   confirmButton: {
-    backgroundColor: "#4052E2",
+    backgroundColor: c.primary,
   },
   buttonText: {
     fontSize: 16,
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     color: "#9497B4",
   },
   blueText: {
-    color: "#4052E2",
+    color: c.primary,
     fontWeight: 600,
   },
 });

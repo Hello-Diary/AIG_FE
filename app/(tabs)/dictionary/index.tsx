@@ -1,9 +1,11 @@
-import BackButton from "@/src/components/common/BackButton";
 import Dictionary from "@/src/components/dictionary/Dictionary";
 import c from "@/src/constants/colors";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 import {
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,8 +14,10 @@ export default function DictionaryScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <BackButton />
-        <Text style={styles.headerTitle}>나의 사전</Text>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>나의사전</Text>
         <View style={{ width: 24 }} />
       </View>
 
