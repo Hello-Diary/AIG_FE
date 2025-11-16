@@ -1,13 +1,17 @@
-import { deleteJournalApi } from "@/src/api/journalApi";
+import { postGrammarCheckApi } from "@/src/api/grammarApi";
+import { deleteJournalApi, getJournalApi } from "@/src/api/journalApi";
 import HomeButton from "@/src/components/common/HomeButton";
 import MoreButton from "@/src/components/common/MoreButton";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import MoveModal from "@/src/components/diary/MoveModal";
 import c from "@/src/constants/colors";
 import { useJournalStore } from "@/src/stores/useJournalStore";
+import { useSuggestionStore } from "@/src/stores/useSuggestionStore";
 import { useUserStore } from "@/src/stores/useUserStore";
+import { Edit, GrammarRequest, GrammarResponse } from "@/src/types/grammar";
+import { JournalResponse } from "@/src/types/journal";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   ScrollView,
@@ -18,55 +22,131 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// API 응답을 가공하여 렌더링할 UI 조각의 타입
+type ProcessedSegment = {
+  text: string;
+  key: string;
+  wrong?: string;
+  explanation?: string;
+};
+
 export default function FeedbackScreen() {
   const { userId } = useUserStore();
-  const { currentJournal } = useJournalStore();
+  const { currentJournalId } = useJournalStore();
+  const { setIsSuggested } = useSuggestionStore();
 
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isDestModalVisible, setIsDestModalVisible] = useState<boolean>(false);
-  // const [isListModalVisible, setIsListModalVisible] = useState<boolean>(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState<boolean>(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] =
+    useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
+  const [originalDiary, setOriginalDiary] = useState<JournalResponse>({} as JournalResponse);
+  const [feedback, setFeedback] = useState<GrammarResponse>();
+  const [processedContent, setProcessedContent] = useState<ProcessedSegment[]>(
+    []
+  );
 
   const router = useRouter();
   const slideAnim = useRef(new Animated.Value(280)).current;
 
-  const data = {
-    date: "2025.02.12",
-    originalDiary:
-      "Today I waked up late and missed the school bus. I runned to the bus stop but the bus already gone. My mom was little angry because I was not ready. At school, I forget my homework at home. It was not best day for me.",
+  const getOriginalDiary = async () => {
+    if (!currentJournalId) {
+      console.log("No journal ID found");
+      return;
+    }
+
+    try {
+      const res = await getJournalApi(userId, currentJournalId);
+      setOriginalDiary(res);
+      setIsSuggested(res.isSuggested);  // isSuggested 전역 상태에 저장
+    } catch (error) {
+      console.error("Failed to get original diary:", error);
+    }
   };
-  const correctedDiary = [
-    { text: "Today I ", key: "1" },
-    {
-      text: "woke",
-      key: "2",
-      wrong: "waked",
-      explanation:
-        "‘wake’는 동사의 원형이고, ‘woke’는 과거형입니다. 오늘 있었던 일을 쓰는 것이므로 과거형 ‘woke’를 사용합니다.",
-    },
-    { text: " up late and missed the school bus. I ", key: "3" },
-    {
-      text: "ran",
-      key: "4",
-      wrong: "runned",
-      explanation:
-        "‘run’의 과거형은 ‘ran’입니다. ‘runned’는 잘못된 형태입니다.",
-    },
-    {
-      text: " to the bus stop, but the bus had already gone. My mom was a little angry because I wasn’t ready. At school, I ",
-      key: "5",
-    },
-    {
-      text: "forgot",
-      key: "6",
-      wrong: "forget",
-      explanation:
-        "‘forget’의 과거형은 ‘forgot’입니다. 과거 시제에 맞게 수정되었습니다.",
-    },
-    { text: " my homework at home. It was not the best day for me.", key: "7" },
-  ];
+
+  const getFeedbackDiary = async () => {
+    if (!currentJournalId) {
+      console.log("No journal ID found");
+      return;
+    }
+
+    if (!originalDiary) {
+      console.log("Original diary not rendered");
+      return;
+    }
+
+    try {
+      const data: GrammarRequest = {
+        text: originalDiary.content,
+      };
+
+      const res = await postGrammarCheckApi(data);
+      setFeedback(res);
+    } catch (error) {
+      console.error("Failed to get grammar feedback:", error);
+    }
+  };
+
+  // 원본 텍스트와 수정 정보를 결합하는 헬퍼 함수
+  const processFeedback = (
+    originalContent: string,
+    edits: Edit[]
+  ): ProcessedSegment[] => {
+    const result: ProcessedSegment[] = [];
+    let currentIndex = 0;
+
+    // start 인덱스 기준으로 오름차순 정렬
+    const sortedEdits = [...edits].sort((a, b) => a.start - b.start);
+
+    sortedEdits.forEach((edit, index) => {
+      // 1. 수정 시작점 이전의 원본 텍스트 추가
+      if (edit.start > currentIndex) {
+        const text = originalContent.substring(currentIndex, edit.start);
+        result.push({
+          text: text,
+          key: `seg-${currentIndex}-${index}`,
+        });
+      }
+
+      // 2. 교정된 텍스트 추가 (클릭 가능한 부분)
+      const originalWord = originalContent.substring(edit.start, edit.end);
+      result.push({
+        text: edit.replace, // 교정된 단어
+        key: `edit-${edit.start}-${index}`,
+        wrong: originalWord, // 교정 전 단어
+        explanation: edit.errDesc, // 설명
+      });
+
+      // 3. 현재 인덱스를 업데이트
+      currentIndex = edit.end;
+    });
+
+    // 4. 마지막 수정 이후의 남은 원본 텍스트 추가
+    if (currentIndex < originalContent.length) {
+      const text = originalContent.substring(currentIndex);
+      result.push({
+        text: text,
+        key: `seg-end-${currentIndex}`,
+      });
+    }
+
+    return result;
+  };
+
+  const formatDate = (d: Date | undefined) => {
+    if (!d) {
+      return "날짜 없음";
+    }
+
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(
+      2,
+      "0"
+    )}`;
+  };
 
   const toggleMenu = () => {
     const toValue = isMenuOpen ? 280 : 0;
@@ -82,9 +162,6 @@ export default function FeedbackScreen() {
     if (action === "dictionary") {
       setIsDestModalVisible(true);
       toggleMenu();
-      // } else if (action === "list") {
-      // setIsListModalVisible(true);
-      //   toggleMenu();
     } else if (action === "delete") {
       setIsDeleteModalVisible(true);
       toggleMenu();
@@ -100,21 +177,12 @@ export default function FeedbackScreen() {
     setIsDestModalVisible(false);
   };
 
-  // const handleListConfirm = () => {
-  //   setIsListModalVisible(false);
-  //   router.push("/list");
-  // }
-
-  // const handleListCancel = () => {
-  //   setIsListModalVisible(false);
-  // }
-
   const handleDeleteConfirm = async () => {
     setIsDeleteModalVisible(false);
 
     try {
-      if (currentJournal) {
-        await deleteJournalApi(userId, currentJournal.journalId);
+      if (currentJournalId !== "") {
+        await deleteJournalApi(userId, currentJournalId);
       }
     } catch (error) {
       console.error("Failed to delete journal:", error);
@@ -127,6 +195,34 @@ export default function FeedbackScreen() {
     setIsDeleteModalVisible(false);
   };
 
+  const handleSuggestion = () => {
+    if (!originalDiary) {
+      console.log("No original diary rendered");
+      return;
+    }
+
+    router.push("/suggestion");
+  };
+
+  useEffect(() => {
+    getOriginalDiary();
+  }, [currentJournalId, userId]); // 의존성 배열 수정
+
+  useEffect(() => {
+    // originalDiary가 있을 때만 getFeedbackDiary 호출
+    if (originalDiary) {
+      getFeedbackDiary();
+    }
+  }, [originalDiary]); // originalDiary가 변경될 때 실행
+
+  useEffect(() => {
+    if (feedback && originalDiary) {
+      // API 응답의 edits 배열과 원본 content를 사용해 UI용 배열 생성
+      const segments = processFeedback(originalDiary.content, feedback.edits);
+      setProcessedContent(segments);
+    }
+  }, [feedback, originalDiary]);
+
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <MoveModal
@@ -135,13 +231,6 @@ export default function FeedbackScreen() {
         onConfirm={handleDestinationConfirm}
         onCancel={handleDestinationCancel}
       />
-
-      {/* <MoveModal
-        destination="list"
-        visible={isListModalVisible}
-        onConfirm={handleListinationConfirm}
-        onCancel={handleListinationCancel}
-      /> */}
 
       <DeleteModal
         visible={isDeleteModalVisible}
@@ -171,14 +260,6 @@ export default function FeedbackScreen() {
           </TouchableOpacity>
           <View style={styles.menuDivider} />
 
-          {/* <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => handleMenuAction("list")}
-          >
-            <Text style={styles.menuItemText}>일기 목록 보기</Text>
-          </TouchableOpacity>
-          <View style={styles.menuDivider} /> */}
-
           <TouchableOpacity
             style={[styles.menuItem, styles.menuItemDelete]}
             onPress={() => handleMenuAction("delete")}
@@ -199,7 +280,7 @@ export default function FeedbackScreen() {
         {/* Header */}
         <View style={styles.header}>
           <HomeButton />
-          <Text style={styles.date}>{data.date}</Text>
+          <Text style={styles.date}>{formatDate(originalDiary?.date)}</Text>
           <MoreButton toggleMenu={toggleMenu} />
         </View>
 
@@ -240,17 +321,17 @@ export default function FeedbackScreen() {
         <View style={styles.scroll}>
           <View style={styles.card}>
             <View style={styles.titleRow}>
-              <Text style={styles.title}>missed the bus</Text>
+              <Text style={styles.title}>{originalDiary?.title}</Text>
               <View style={styles.emoji}>
-                <Text>😱</Text>
+                <Text>{originalDiary?.emoji}</Text>
               </View>
             </View>
 
             {selectedTab === "my" ? (
-              <Text style={styles.content}>{data.originalDiary}</Text>
+              <Text style={styles.content}>{originalDiary?.content}</Text>
             ) : (
               <Text style={styles.content}>
-                {correctedDiary.map((item) => {
+                {processedContent.map((item) => {
                   if (item.explanation) {
                     return (
                       <Text
@@ -287,15 +368,17 @@ export default function FeedbackScreen() {
               ⓘ 교정된 단어를 클릭하여 설명을 확인하세요.
             </Text>
           )}
+
+          {/* processedContent.find로 변경 */}
           {selectedTab === "ai" && selectedWord && (
             <View style={styles.explainBox}>
               <Text style={styles.explainTitle}>
-                {correctedDiary.find((d) => d.key === selectedWord)?.wrong} →{" "}
-                {correctedDiary.find((d) => d.key === selectedWord)?.text}
+                {processedContent.find((d) => d.key === selectedWord)?.wrong} →{" "}
+                {processedContent.find((d) => d.key === selectedWord)?.text}
               </Text>
               <Text style={styles.explainText}>
                 {
-                  correctedDiary.find((d) => d.key === selectedWord)
+                  processedContent.find((d) => d.key === selectedWord)
                     ?.explanation
                 }
               </Text>
@@ -306,7 +389,10 @@ export default function FeedbackScreen() {
 
       {/* 하단 버튼 */}
       <View style={styles.bottomFixedContainer}>
-        <TouchableOpacity style={styles.footerButton}>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={handleSuggestion}
+        >
           <View style={styles.footerButtonUnderline}>
             <Text style={styles.footerButtonText}>AI 추천 표현 보기</Text>
           </View>

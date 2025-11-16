@@ -1,25 +1,16 @@
 import { create } from "zustand";
-import { JournalResponse } from "../types/journal";
 
 interface JournalState {
-  currentJournal: JournalResponse;
+  currentJournalId: string;
   diaryDate: Date;
 
-  setCurrentJournal: (currentJournal: JournalResponse) => void;
+  setCurrentJournalId: (currentJournalId: string) => void;
 }
 
 export const useJournalStore = create<JournalState>((set) => ({
-  currentJournal: {
-    journalId: "",
-    userId: "",
-    title: "",
-    content: "",
-    emoji: "",
-    date: new Date(),
-    submittedAt: new Date(),
-  },
+  currentJournalId: "0",
   diaryDate: new Date(),
 
-  setCurrentJournal: (currentJournal: JournalResponse) => set({ currentJournal }),
+  setCurrentJournalId: (currentJournalId: string) => set({ currentJournalId }),
   setDiaryDate: (diaryDate: Date) => set({ diaryDate }),
 }));

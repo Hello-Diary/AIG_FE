@@ -41,7 +41,7 @@ const inputAccessoryViewID = "diaryInputAccessory";
 
 export default function DiaryScreen() {
   const { userId } = useUserStore();
-  const { diaryDate, setCurrentJournal } = useJournalStore();
+  const { diaryDate, setCurrentJournalId } = useJournalStore();
   const [topicQuestion, setTopicQuestion] = useState<Question | null>(null);
 
   const [date, setDate] = useState(diaryDate);
@@ -76,7 +76,7 @@ export default function DiaryScreen() {
 
       const res = await postJournalApi(userId, data);
 
-      setCurrentJournal(res);
+      setCurrentJournalId(res.journalId);
     } catch (error) {
       console.error("Failed to post journal:", error);
     }
@@ -100,28 +100,6 @@ export default function DiaryScreen() {
 
   const handleDrawTopic = async () => {
     const res = await getAllQuestionApi();
-    // const res = [
-    //   {
-    //     questionId: "1",
-    //     text: "question 1",
-    //     createdAt: new Date(),
-    //   },
-    //   {
-    //     questionId: "2",
-    //     text: "question 2",
-    //     createdAt: new Date(),
-    //   },
-    //   {
-    //     questionId: "3",
-    //     text: "question 3",
-    //     createdAt: new Date(),
-    //   },
-    //   {
-    //     questionId: "4",
-    //     text: "question 4",
-    //     createdAt: new Date(),
-    //   },
-    // ];
     const randomIndex = Math.floor(Math.random() * res.length);
 
     setTopicQuestion(res[randomIndex]);
@@ -146,6 +124,7 @@ export default function DiaryScreen() {
     setPickerVisible(false);
   };
 
+  // TODO: formatdate method utils로 분리하기
   const formatDate = (d: Date) => {
     const year = d.getFullYear();
     const month = d.getMonth() + 1;
@@ -208,7 +187,7 @@ export default function DiaryScreen() {
       };
 
       const res = await postJournalApi(userId, data);
-      setCurrentJournal(res);
+      setCurrentJournalId(res.journalId);
     } catch (error) {
       console.error("Failed to save journal temporarily:", error);
     }
