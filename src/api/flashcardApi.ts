@@ -6,7 +6,7 @@ import { ENDPOINT } from "./endPoint";
 import { http } from "./http";
 
 export const getSavedFlashcardsApi = async () => {
-  const res = await http.get<FlashcardResponse[]>(`${ENDPOINT.DICTIONARY}/flashcards`);
+  const res = await http.get<FlashcardResponse[]>(`${ENDPOINT.DICTIONARY}`);
   return res;
 };
 
