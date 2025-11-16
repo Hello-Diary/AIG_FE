@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 
 // 💡 Constants 임포트 추가 (Safe Area 처리를 위해)
 import DiaryEntryItem from '@/src/components/home/DiaryEntryItem';
 import { ChevronLeftIcon, SearchIcon } from '@/src/components/home/SvgIcons';
+import c from '@/src/constants/colors';
 import Constants from 'expo-constants';
 
 interface DiaryEntry {
@@ -122,23 +123,23 @@ const SearchView: React.FC<SearchViewProps> = ({
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#ffffff' },
+    container: { flex: 1, backgroundColor: c.mainwhite },
     // 💡 Header 높이와 Safe Area를 HomeView와 일관되게 수정
     searchHeader: { 
         flexDirection: 'row', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
         paddingHorizontal: 16, 
-        backgroundColor: '#4052E2', 
+        backgroundColor: c.primary, 
         // Safe Area + 상단 여백 (HomeView와 높이 일치)
         paddingTop: 13 + Constants.statusBarHeight, 
         paddingBottom: 16,
     },
     backButton: { padding: 4 },
-    searchHeaderTitle: { fontSize: 18, fontWeight: '500', color: '#ffffff', flex: 1, textAlign: 'center', marginHorizontal: 16 },
+    searchHeaderTitle: { fontSize: 18, fontWeight: '500', color: c.mainwhite, flex: 1, textAlign: 'center', marginHorizontal: 16 },
     placeholder: { width: 24 },
-    activeSearchContainer: { position: 'relative', paddingHorizontal: 16, paddingBottom: 16, backgroundColor: '#4052E2' },
-    activeSearchInput: { backgroundColor: '#ffffff', color: '#000', paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, fontSize: 15, height: 40 },
+    activeSearchContainer: { position: 'relative', paddingHorizontal: 16, paddingBottom: 16, backgroundColor: c.primary },
+    activeSearchInput: { backgroundColor: c.mainwhite, color: c.black, paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, fontSize: 15, height: 40 },
     
     // 💡 돋보기 아이콘 위치 수정: Input 중앙에 위치하도록 translateY 조정
     searchIcon: { 
@@ -157,11 +158,11 @@ const styles = StyleSheet.create({
     removeTagButton: { width: 24, height: 24, justifyContent: 'center', alignItems: 'center' },
     removeTagText: { color: '#777', fontSize: 18, fontWeight: 'bold' },
     grammarSection: { paddingHorizontal: 16, paddingVertical: 16, borderTopWidth: 1, borderTopColor: '#e5e7eb' },
-    sectionTitle2: { fontSize: 15, fontWeight: '500', color: '#000' },
+    sectionTitle2: { fontSize: 15, fontWeight: '500', color: c.black },
     sectionSubTitle: { fontSize: 13, fontWeight: '500', color: '#626262' },
     grammarList: { gap: 12 },
     grammarItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, gap: 12 },
-    grammarIcon: { fontSize: 16, color: '#4052E2' },
+    grammarIcon: { fontSize: 16, color: c.primary},
     grammarText: { flex: 1, fontSize: 16, color: '#374151' },
     grammarArrow: { fontSize: 18, color: '#9ca3af' },
     previousSearchSection: { paddingHorizontal: 16, paddingVertical: 16, borderTopWidth: 1, borderTopColor: '#e5e7eb' },

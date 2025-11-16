@@ -1,7 +1,8 @@
 // src/components/home/MiniCalendar.tsx (수정된 전체 코드)
 
+import c from '@/src/constants/colors';
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface DayData {
     day: number;
@@ -91,10 +92,10 @@ const styles = StyleSheet.create({
       borderRadius: 35, 
   },
   defaultDayContainer: {
-      backgroundColor: '#fff',
+      backgroundColor: c.mainwhite,
   },
   selectedDayContainer: {
-      backgroundColor: '#4052E2',
+      backgroundColor: c.primary,
   },
   
   dayNameText: {

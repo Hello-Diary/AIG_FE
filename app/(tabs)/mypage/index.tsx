@@ -1,5 +1,5 @@
-import PlusButton from "@/src/components/PlusButton";
-import Reminder from "@/src/components/Reminder";
+import PlusButton from "@/src/components/diary/AddDiaryButton";
+import Reminder from "@/src/components/mypage/Reminder";
 import c from "@/src/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";

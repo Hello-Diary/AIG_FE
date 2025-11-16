@@ -1,4 +1,4 @@
-import Dictionary from "@/src/components/Dictionary";
+import Dictionary from "@/src/components/dictionary/Dictionary";
 import c from "@/src/constants/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";

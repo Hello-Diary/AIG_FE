@@ -1,3 +1,4 @@
+import c from "@/src/constants/colors";
 import { useRouter } from "expo-router";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import Svg, { Path } from "react-native-svg";
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 16,
     bottom: 50,
-    backgroundColor: "#4052E2",
+    backgroundColor: c.primary,
     width: 52,
     height: 52,
     borderRadius: 50,
