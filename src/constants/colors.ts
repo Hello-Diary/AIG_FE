@@ -9,21 +9,14 @@ const Colors = {
   // 일반 색상
   mainwhite: '#FFFFFF',
   black: '#000000',
-  blue: '#5856D6',
-  lightblue: '#F9FBFF',
   bluegray1: '#9199A6',
   gray1: '#626262',
   gray2: '#A8A8A8',
-  gray3: '#959595',
-  gray4: '#E5E5E5',
   pink: '#FFE3E3',
-  yellow: '#FDF1CF',
-  red: '#E74C3C',
 
   // 컴포넌트 색상
   bg: '#F9FBFF',
-  border: '#AFC0DC',
-  button: '#D3D3D3',
+  button: '#D5D5D5',
 };
 
 export default Colors;

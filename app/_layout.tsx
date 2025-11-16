@@ -1,16 +1,16 @@
-import c from "@/src/constants/colors";
-import * as Notifications from "expo-notifications";
-import { Stack, useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import c from '@/src/constants/colors';
+import * as Notifications from 'expo-notifications';
+import { Stack, useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
 
 function useNotificationObserver() {
   const router = useRouter();
-
+  
   useEffect(() => {
     function redirect(notification: Notifications.Notification) {
       const url = notification.request.content.data?.url;
-      if (typeof url === "string") {
-        router.push("/");
+      if (typeof url === 'string') {
+        router.push("/diary");
       }
     }
 
@@ -19,11 +19,9 @@ function useNotificationObserver() {
       redirect(response.notification);
     }
 
-    const subscription = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
-        redirect(response.notification);
-      }
-    );
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      redirect(response.notification);
+    });
 
     return () => {
       subscription.remove();
@@ -41,7 +39,7 @@ export default function RootLayout() {
         contentStyle: { backgroundColor: c.bg },
       }}
     >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false}} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

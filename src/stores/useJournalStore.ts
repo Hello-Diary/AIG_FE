@@ -8,7 +8,8 @@ interface JournalState {
 }
 
 export const useJournalStore = create<JournalState>((set) => ({
-  currentJournalId: "0",
+  // DONE: 초기값 지우기! - feedbackpage -> suggestionpage로 이동하려고 넣어둠
+  currentJournalId: "",
   diaryDate: new Date(),
 
   setCurrentJournalId: (currentJournalId: string) => set({ currentJournalId }),
