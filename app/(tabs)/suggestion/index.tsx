@@ -2,8 +2,8 @@ import BackButton from "@/src/components/common/BackButton";
 import c from "@/src/constants/colors";
 
 // API 함수 import
-import { getFeedbackApi, getNewFeedbackApi } from "@/src/api/feedbackApi";
 import { batchToggleFlashcardsApi } from "@/src/api/flashcardApi";
+import { getNewSuggestionApi, getSuggestionApi } from "@/src/api/suggestionApi";
 
 // 타입 import
 import {
@@ -110,10 +110,10 @@ export default function SuggestionScreen() {
         let responseSuggestions: IdiomSuggestion[] = []; // API 결과를 담을 변수
 
         if (isSuggested) {
-          const res = await getFeedbackApi(currentJournalId);
+          const res = await getSuggestionApi(currentJournalId);
           responseSuggestions = res.suggestions; // API 응답을 변수에 저장
         } else {
-          const res = await getNewFeedbackApi(currentJournalId);
+          const res = await getNewSuggestionApi(currentJournalId);
           responseSuggestions = res.suggestions; // API 응답을 변수에 저장
           setIsSuggested(true);
         }

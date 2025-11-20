@@ -1,7 +1,7 @@
 import {
   getSuggestionByJournalIdApi,
   postSuggestionApi,
-} from "@/src/api/feedbackApi";
+} from "@/src/api/suggestionApi";
 import BackButton from "@/src/components/common/BackButton";
 import Suggestion, {
   SuggestionWithState,

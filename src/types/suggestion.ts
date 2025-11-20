@@ -1,8 +1,8 @@
 import { IdiomSuggestion } from "./dictionary";
 
-export interface FeedbackResponse {
-  feedbackId: string;
+export interface SuggestionResponse {
+  suggestionId: string;
   journalId: string;
   suggestions: IdiomSuggestion[];
-  createdAt: Date;
+  createdAt: string;
 }

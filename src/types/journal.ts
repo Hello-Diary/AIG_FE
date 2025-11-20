@@ -2,7 +2,7 @@ export interface JournalRequest {
   title: string;
   content: string;
   emoji: string | null;
-  date: Date;
+  date: string;
   questionId: string | null;
 }
 
@@ -12,7 +12,7 @@ export interface JournalResponse {
   title: string;
   content: string;
   emoji: string | null;
-  date: Date;
-  submittedAt: Date;
+  date: string;
+  submittedAt: string;
   isSuggested: boolean;
 }

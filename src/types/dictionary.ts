@@ -25,5 +25,5 @@ export interface FlashcardResponse {
   userId: string;
   journalId: string;
   feedbackId: string;
-  createdAt: Date;
+  createdAt: string;
 }

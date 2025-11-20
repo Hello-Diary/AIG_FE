@@ -16,51 +16,7 @@ import {
   View,
 } from "react-native";
 
-// export const MOCK_DICTIONARY_DATA: FlashcardResponse[] = [
-//   {
-//     flashcardId: "fc-id-001",
-//     front: "Break a leg",
-//     back: "행운을 빌어!",
-//     tags: ["common", "performance"],
-//     userId: "user-123",
-//     journalId: "journal-abc",
-//     feedbackId: "feedback-xyz-1",
-//     createdAt: new Date("2025-11-15T10:30:00"),
-//   },
-//   {
-//     flashcardId: "fc-id-002",
-//     front: "Bite the bullet",
-//     back: "이를 악물고 참다",
-//     tags: ["difficulty", "common"],
-//     userId: "user-123",
-//     journalId: "journal-abc",
-//     feedbackId: "feedback-xyz-2",
-//     createdAt: new Date("2025-11-14T14:20:00"),
-//   },
-//   {
-//     flashcardId: "fc-id-003",
-//     front: "Spill the beans",
-//     back: "비밀을 누설하다",
-//     tags: ["secret", "social"],
-//     userId: "user-123",
-//     journalId: "journal-def",
-//     feedbackId: "feedback-xyz-3",
-//     createdAt: new Date("2025-11-13T09:05:00"),
-//   },
-//   {
-//     flashcardId: "fc-id-004",
-//     front: "Once in a blue moon",
-//     back: "극히 드물게",
-//     tags: ["frequency", "rare"],
-//     userId: "user-123",
-//     journalId: "journal-ghi",
-//     feedbackId: "feedback-xyz-4",
-//     createdAt: new Date("2025-11-12T18:45:00"),
-//   },
-// ];
-
 export default function Dictionary() {
-  // const [suggestions, setSuggestions] = useState<FlashcardResponse[]>(MOCK_DICTIONARY_DATA);
   const [suggestions, setSuggestions] = useState<FlashcardResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedIdiom, setSelectedIdiom] = useState<IdiomSuggestion | null>(

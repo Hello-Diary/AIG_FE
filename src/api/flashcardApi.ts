@@ -1,7 +1,7 @@
 import {
   FlashcardRequest,
   FlashcardResponse,
-} from "../types/dictionary";
+} from "../types/flashcard";
 import { ENDPOINT } from "./endPoint";
 import { http } from "./http";
 

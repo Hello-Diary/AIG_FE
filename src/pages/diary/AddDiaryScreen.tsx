@@ -70,7 +70,7 @@ export default function DiaryScreen() {
         title,
         content: description,
         emoji: selectedEmoji,
-        date,
+        date: date instanceof Date ? date.toISOString().split("T")[0] : date,
         questionId: topicQuestion ? topicQuestion.questionId : null,
       };
 
@@ -81,7 +81,7 @@ export default function DiaryScreen() {
       console.error("Failed to post journal:", error);
     }
 
-    router.push("/feedback");
+    router.push("/grammar");
   };
 
   const handleEmojiInput = (currentInputText: string) => {
@@ -182,7 +182,7 @@ export default function DiaryScreen() {
         title,
         content: description,
         emoji: selectedEmoji,
-        date,
+        date: date instanceof Date ? date.toISOString().split("T")[0] : date,
         questionId: topicQuestion ? topicQuestion.questionId : null,
       };
 

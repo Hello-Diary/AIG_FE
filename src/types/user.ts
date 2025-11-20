@@ -8,5 +8,5 @@ export interface UserResponse {
   email: string;
   name: string;
   profile: string;
-  createdAt: Date;
+  createdAt: string;
 }

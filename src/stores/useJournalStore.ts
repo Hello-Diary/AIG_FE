@@ -8,7 +8,7 @@ interface JournalState {
 }
 
 export const useJournalStore = create<JournalState>((set) => ({
-  // DONE: 초기값 지우기! - feedbackpage -> suggestionpage로 이동하려고 넣어둠
+  // DONE: 초기값 지우기! - grammar feedback page -> suggestion page로 이동하려고 넣어둠
   currentJournalId: "",
   diaryDate: new Date(),
 

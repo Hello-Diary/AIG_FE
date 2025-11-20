@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-export default function FeedbackLayout() {
+export default function GrammarFeedbackLayout() {
   return (
     <Stack>
       <Stack.Screen

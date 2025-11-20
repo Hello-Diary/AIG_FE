@@ -64,7 +64,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="feedback"
+        name="grammar"
         options={{
           href: null,
           headerShown: false,

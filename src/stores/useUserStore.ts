@@ -15,7 +15,8 @@ type UserState = {
 };
 
 export const useUserStore = create<UserState>((set) => ({
-  userId: '',
+  // TODO: userId 초기값 빈 문자열로 변경 필요
+  userId: 'e35aee21-8ab2-4d1c-bbac-41c3ac88ddef',
   email: '',
   name: '',
   profileKeyword: '',

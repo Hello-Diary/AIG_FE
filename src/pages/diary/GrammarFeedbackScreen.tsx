@@ -30,7 +30,7 @@ type ProcessedSegment = {
   explanation?: string;
 };
 
-export default function FeedbackScreen() {
+export default function GrammarFeedbackScreen() {
   const { userId } = useUserStore();
   const { currentJournalId } = useJournalStore();
   const { setIsSuggested } = useSuggestionStore();
@@ -42,7 +42,7 @@ export default function FeedbackScreen() {
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [originalDiary, setOriginalDiary] = useState<JournalResponse>({} as JournalResponse);
-  const [feedback, setFeedback] = useState<GrammarResponse>();
+  const [grammarFeedback, setGrammarFeedback] = useState<GrammarResponse>();
   const [processedContent, setProcessedContent] = useState<ProcessedSegment[]>(
     []
   );
@@ -82,7 +82,7 @@ export default function FeedbackScreen() {
       };
 
       const res = await postGrammarCheckApi(data);
-      setFeedback(res);
+      setGrammarFeedback(res);
     } catch (error) {
       console.error("Failed to get grammar feedback:", error);
     }
@@ -216,12 +216,12 @@ export default function FeedbackScreen() {
   }, [originalDiary]); // originalDiary가 변경될 때 실행
 
   useEffect(() => {
-    if (feedback && originalDiary) {
+    if (grammarFeedback && originalDiary) {
       // API 응답의 edits 배열과 원본 content를 사용해 UI용 배열 생성
-      const segments = processFeedback(originalDiary.content, feedback.edits);
+      const segments = processFeedback(originalDiary.content, grammarFeedback.edits);
       setProcessedContent(segments);
     }
-  }, [feedback, originalDiary]);
+  }, [grammarFeedback, originalDiary]);
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
@@ -280,7 +280,7 @@ export default function FeedbackScreen() {
         {/* Header */}
         <View style={styles.header}>
           <HomeButton />
-          <Text style={styles.date}>{formatDate(originalDiary?.date)}</Text>
+          <Text style={styles.date}>{originalDiary?.date}</Text>
           <MoreButton toggleMenu={toggleMenu} />
         </View>
 
