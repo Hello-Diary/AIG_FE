@@ -79,6 +79,8 @@ export default function GrammarFeedbackScreen() {
     try {
       const data: GrammarRequest = {
         text: originalDiary.content,
+        // TODO: 명세서에 맞게 수정
+        language: "en",
       };
 
       const res = await postGrammarCheckApi(data);

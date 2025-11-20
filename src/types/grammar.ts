@@ -10,6 +10,7 @@ export interface Edit {
 
 export interface GrammarRequest {
   text: string;
+  language: string;
 }
 
 export interface GrammarResponse {
