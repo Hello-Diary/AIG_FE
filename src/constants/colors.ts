@@ -23,6 +23,7 @@ const Colors = {
   // 컴포넌트 색상
   bg: '#F9FBFF',
   border: '#AFC0DC',
+  border2: '#F4F4F4',
   button: '#D3D3D3',
 };
 

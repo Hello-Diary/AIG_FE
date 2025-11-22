@@ -1,5 +1,3 @@
-// app/index.tsx
-
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import CalendarView from '../../../src/pages/home/CalendarView';
@@ -84,13 +82,10 @@ export default function HomePage() {
     setSearchTags(searchTags.filter(tag => tag !== tagToRemove));
   };
 
-  // -----------------------------------------------------------------------
-
   if (currentView === 'home') {
     return (
         <HomeView 
-            setCurrentView={setCurrentView} 
-            diaryEntries={diaryEntries} 
+            setCurrentView={setCurrentView}
             koreanDayNames={koreanDayNames} 
         />
     );
@@ -106,7 +101,7 @@ export default function HomePage() {
             diaryEntries={diaryEntries}
         />
     );
-  } else { // currentView === 'search'
+  } else {
     return (
         <SearchView 
             setCurrentView={setCurrentView} 
