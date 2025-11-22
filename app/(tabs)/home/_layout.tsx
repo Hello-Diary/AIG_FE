@@ -10,6 +10,12 @@ export default function HomeLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen 
+        name="journal" 
+        options={{ 
+          headerShown: false,
+        }} 
+      />
     </Stack>
   );
 }

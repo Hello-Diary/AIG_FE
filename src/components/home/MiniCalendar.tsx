@@ -1,5 +1,3 @@
-// src/components/home/MiniCalendar.tsx (수정된 전체 코드)
-
 import c from '@/src/constants/colors';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -37,10 +35,9 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ koreanDayNames, days, selec
                             activeOpacity={0.7}
                         >
                             <View style={[
-                                styles.dayContainer, // 요일 + 날짜를 감싸는 메인 타원
+                                styles.dayContainer,
                                 isItemSelected ? styles.selectedDayContainer : styles.defaultDayContainer,
                             ]}>
-                                {/* 1. 요일 이름 */}
                                 <Text style={[
                                     styles.dayNameText,
                                     isItemSelected ? styles.selectedDayNameText : styles.defaultDayNameText,
@@ -48,12 +45,10 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ koreanDayNames, days, selec
                                     {dayName}
                                 </Text>
 
-                                {/* 2. 날짜 (흰색 원으로 감싸기) */}
                                 <View style={styles.dateCircle}>
                                     <Text style={[
                                         styles.dateText,
                                         isItemSelected ? styles.selectedDateText : styles.defaultDateText,
-                                        // 💡 item.isToday 강조 스타일 제거
                                     ]}>
                                         {item.day}
                                     </Text>

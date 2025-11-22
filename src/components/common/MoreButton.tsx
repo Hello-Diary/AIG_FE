@@ -1,13 +1,29 @@
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 interface MoreButtonProps {
   toggleMenu: () => void;
+  // 💡 [추가] disabled prop 추가
+  disabled?: boolean;
 }
 
-export default function MoreButton({ toggleMenu }: MoreButtonProps) {
+// 💡 disabled prop을 구조 분해 할당으로 받습니다.
+export default function MoreButton({ toggleMenu, disabled = false }: MoreButtonProps) {
+  
+  // disabled 상태에 따라 버튼의 동작을 제어합니다.
+  const handlePress = () => {
+    if (!disabled) {
+      toggleMenu();
+    }
+  };
+
   return (
-    <TouchableOpacity style={{ padding: 8 }} onPress={toggleMenu}>
+    // 💡 TouchableOpacity에 disabled prop을 적용하고 스타일을 조정합니다.
+    <TouchableOpacity 
+      style={[styles.button, { opacity: disabled ? 0.3 : 1 }]} 
+      onPress={handlePress} 
+      disabled={disabled}
+    >
       <Svg width="25" height="25" viewBox="0 0 17 17" fill="none">
         <Path
           d="M8.89209 9.28748C9.26525 9.28748 9.56775 8.98497 9.56775 8.61182C9.56775 8.23866 9.26525 7.93616 8.89209 7.93616C8.51893 7.93616 8.21643 8.23866 8.21643 8.61182C8.21643 8.98497 8.51893 9.28748 8.89209 9.28748Z"
@@ -34,3 +50,9 @@ export default function MoreButton({ toggleMenu }: MoreButtonProps) {
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+    button: {
+        padding: 8,
+    }
+});

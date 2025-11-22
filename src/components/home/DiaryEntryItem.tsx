@@ -1,4 +1,4 @@
-// src/components/DiaryEntryItem.tsx
+// src/components/DiaryEntryItem.tsx (수정된 부분)
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
@@ -7,7 +7,7 @@ interface DiaryEntry {
   emoji: string;
   title: string;
   content: string;
-  time?: string; // HomeView에서 time이 없을 수 있으므로 선택적으로 설정
+  time?: string; 
 }
 
 interface DiaryEntryItemProps {
@@ -17,15 +17,21 @@ interface DiaryEntryItemProps {
 
 const DiaryEntryItem: React.FC<DiaryEntryItemProps> = ({ entry, isSearchItem = false }) => (
   <View style={[styles.entryItem, isSearchItem ? styles.searchEntryItem : styles.defaultEntryItem]}>
-    {/* time 속성이 있고 검색 항목이 아닐 때만 렌더링 */}
-    {!isSearchItem && entry.time ? (
-      <Text style={styles.entryTime}>{entry.time}</Text>
-    ) : null}
     <View style={styles.entryContent}>
-      <Text style={styles.entryEmoji}>{entry.emoji}</Text>
-      <View style={styles.entryTextContainer}>
+      <View style={styles.titleAndEmojiWrapper}>
+        <Text style={styles.entryEmoji}>{entry.emoji}</Text>
         <Text style={styles.entryTitle}>{entry.title}</Text>
-        <Text style={styles.entryText}>{entry.content}</Text>
+      </View>
+      
+      <View style={styles.entryTextContainer}>
+        {/* 💡 수정: numberOfLines 속성을 사용하여 최대 줄 수를 2줄 또는 3줄로 제한 */}
+        <Text 
+          style={styles.entryText}
+          numberOfLines={3} // 텍스트를 최대 3줄로 제한합니다.
+          ellipsizeMode="tail" // 텍스트가 잘릴 경우 ... (말줄임표)를 표시합니다.
+        >
+          {entry.content}
+        </Text>
       </View>
     </View>
   </View>
@@ -33,8 +39,6 @@ const DiaryEntryItem: React.FC<DiaryEntryItemProps> = ({ entry, isSearchItem = f
 
 const styles = StyleSheet.create({
   defaultEntryItem: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
     paddingBottom: 16,
   },
   searchEntryItem: {
@@ -42,35 +46,52 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     marginBottom: 12,
-    borderBottomWidth: 0, // 검색 항목은 별도의 배경색을 가지므로 하단 줄 제거
+    borderBottomWidth: 0, 
     paddingBottom: 16,
   },
   entryItem: {
-    // 공통 스타일 (필요시 추가)
   },
   entryTime: {
     color: '#6b7280',
-    fontSize: 12,
+    fontSize: 14,
     marginBottom: 4,
   },
   entryContent: {
-    flexDirection: 'row',
+    flexDirection: 'column', 
     alignItems: 'flex-start',
-    gap: 8,
+    borderWidth: 1,
+    borderColor: "#F4F4F4",
+    borderRadius: 8,
+    padding: 20,
+    backgroundColor: "#fff",
   },
+  
+  titleAndEmojiWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 2,
+  },
+  
   entryEmoji: {
-    fontSize: 18,
+    fontSize: 16, 
   },
+  
+  entryTitle: {
+    fontWeight: '600',
+    fontSize: 14,
+    color: "#000",
+  },
+  
   entryTextContainer: {
     flex: 1,
   },
-  entryTitle: {
-    fontWeight: '500',
-    fontSize: 16,
-  },
+  
   entryText: {
-    color: '#4b5563',
+    color: '#000',
     fontSize: 14,
+    fontWeight: '400',
+    width: '100%', 
   },
 });
 

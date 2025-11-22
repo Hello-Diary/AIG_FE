@@ -1,7 +1,3 @@
-// src/screens/CalendarView.tsx
-
-// TODO: 이거 쓰는 곳이 없는데용??
-
 import AddDiaryButton from "@/src/components/diary/AddDiaryButton";
 import {
     ChevronLeftIcon,
