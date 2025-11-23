@@ -2,21 +2,21 @@ import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 // Svg Icons
 import CalendarSvg from "@/assets/images/calender.svg";
 import {
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    Plus2Icon,
-    SearchIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  Plus2Icon,
+  SearchIcon,
 } from "../../components/home/SvgIcons";
 // Components
 import AddDiaryButton from "@/src/components/diary/AddDiaryButton";

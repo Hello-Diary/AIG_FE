@@ -5,6 +5,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 export interface UserProfile {
   userId: string;
   name: string;
+  email: string | null;
+  profileKeyword: string | null;
+  createdAt?: Date | null;
 }
 
 type UserState = {
@@ -31,9 +34,9 @@ export const useAuthStore = create<UserState>()(
         set({
           userId: profile.userId,
           name: profile.name,
-          email: null,
-          profileKeyword: null,
-          createdAt: null,
+          email: profile.email,
+          profileKeyword: profile.profileKeyword,
+          createdAt: profile.createdAt ?? null,
         });
       },
       signOut: () =>
