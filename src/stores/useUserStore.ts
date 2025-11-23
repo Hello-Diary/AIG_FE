@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export interface UserProfile {
   userId: string;
@@ -8,11 +8,11 @@ export interface UserProfile {
 }
 
 type UserState = {
-  userId: string | null; 
+  userId: string | null;
   email: string | null;
   name: string | null;
   profileKeyword: string | null;
-  createdAt: Date | null; 
+  createdAt: Date | null;
 
   signIn: (profile: UserProfile) => void;
   signOut: () => void;
@@ -31,22 +31,23 @@ export const useAuthStore = create<UserState>()(
         set({
           userId: profile.userId,
           name: profile.name,
-          email: null, 
+          email: null,
           profileKeyword: null,
           createdAt: null,
         });
       },
-      signOut: () => set({ 
-        userId: null,
-        email: null,
-        name: null,
-        profileKeyword: null,
-        createdAt: null,
-      }),
+      signOut: () =>
+        set({
+          userId: null,
+          email: null,
+          name: null,
+          profileKeyword: null,
+          createdAt: null,
+        }),
     }),
     {
-      name: 'auth-user-storage', 
-      storage: createJSONStorage(() => AsyncStorage), 
+      name: "auth-user-storage",
+      storage: createJSONStorage(() => AsyncStorage),
     }
   )
 );

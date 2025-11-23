@@ -1,6 +1,6 @@
+import { JournalListResponse, JournalRequest, JournalResponse } from "../types/journal";
 import { ENDPOINT } from "./endPoint";
 import { http } from "./http";
-import { JournalRequest, JournalResponse, JournalListResponse } from "../types/journal";
 
 export const getAllJournalApi = async (userId: string, page: number = 1) => {
   const res = await http.get<JournalListResponse>(
