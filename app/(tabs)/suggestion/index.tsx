@@ -15,6 +15,7 @@ import { useJournalStore } from "@/src/stores/useJournalStore";
 import { useSuggestionStore } from "@/src/stores/useSuggestionStore";
 
 // React & React Native
+import { Suggestion } from "@/src/types/suggestion";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { JSX, useEffect, useState } from "react";
@@ -28,28 +29,16 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// 화면 내부에서 토글 상태를 관리하기 위한 타입
-export interface SelectableSuggestion extends IdiomSuggestion {
-  isFlashcard: boolean; // 로컬 UI 상태
-}
-
 export default function SuggestionScreen() {
   const router = useRouter();
   const { isSuggested, setIsSuggested } = useSuggestionStore();
   const { currentJournalId } = useJournalStore();
 
-  const [suggestions, setSuggestions] = useState<SelectableSuggestion[]>([]);
-  // const [suggestions, setSuggestions] = useState<SelectableSuggestion[]>(
-  //   MOCK_SUGGESTIONS.map((s) => ({
-  //     ...s,
-  //     isFlashcard: false, // Default to unchecked
-  //   }))
-  // );
-  const [apiResponse, setApiResponse] = useState<IdiomSuggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   // 항목 확장을 위한 state (IdiomSuggestion 타입 사용)
-  const [selectedIdiom, setSelectedIdiom] = useState<IdiomSuggestion | null>(
+  const [selectedIdiom, setSelectedIdiom] = useState<Suggestion | null>(
     null
   );
 
@@ -64,14 +53,14 @@ export default function SuggestionScreen() {
       setIsLoading(true);
 
       try {
-        let responseSuggestions: IdiomSuggestion[] = []; // API 결과를 담을 변수
+        let responseSuggestions: Suggestion[] = []; // API 결과를 담을 변수
 
         if (isSuggested) {
           const res = await getSuggestionApi(currentJournalId);
-          responseSuggestions = res.suggestions; // API 응답을 변수에 저장
+          responseSuggestions = res; // API 응답을 변수에 저장
         } else {
           const res = await getNewSuggestionApi(currentJournalId);
-          responseSuggestions = res.suggestions; // API 응답을 변수에 저장
+          responseSuggestions = res; // API 응답을 변수에 저장
           setIsSuggested(true);
         }
 
@@ -96,14 +85,14 @@ export default function SuggestionScreen() {
   const handleToggle = (id: string) => {
     setSuggestions((currentSuggestions) =>
       currentSuggestions.map((s) =>
-        s.id === id ? { ...s, isFlashcard: !s.isFlashcard } : s
+        s.suggestionId === id ? { ...s, isFlashcard: !s.isFlashcard } : s
       )
     );
   };
 
   // 항목 확장/축소 핸들러 (IdiomSuggestion의 'id' 사용)
-  const handleIdiomPress = (idiom: IdiomSuggestion): void => {
-    if (selectedIdiom?.id === idiom.id) {
+  const handleIdiomPress = (idiom: Suggestion): void => {
+    if (selectedIdiom?.suggestionId === idiom.suggestionId) {
       setSelectedIdiom(null);
     } else {
       setSelectedIdiom(idiom);
@@ -118,7 +107,7 @@ export default function SuggestionScreen() {
     const itemsToSave = suggestions
       .filter((s) => s.isFlashcard) // true로 토글된 항목만
       .map((s) => ({
-        suggestionId: s.id,
+        suggestionId: s.suggestionId,
         isFlashcard: true,
       }));
 
@@ -150,16 +139,16 @@ export default function SuggestionScreen() {
 
   // 렌더링 함수
   const renderIdiomItem = (
-    idiom: SelectableSuggestion,
+    idiom: Suggestion,
     index: number
   ): JSX.Element => {
     // 'id' 기준으로 확장 여부 확인
-    const isExpanded: boolean = selectedIdiom?.id === idiom.id;
+    const isExpanded: boolean = selectedIdiom?.suggestionId === idiom.suggestionId;
     const isToggled: boolean = idiom.isFlashcard; // state에 저장된 값 사용
 
     return (
       // key 값으로 'id' 사용
-      <View key={`${idiom.id}-${index}`}>
+      <View key={`${idiom.suggestionId}-${index}`}>
         <TouchableOpacity
           style={styles.idiomItem}
           onPress={() => handleIdiomPress(idiom)} // 본문 클릭 시 확장
@@ -168,7 +157,7 @@ export default function SuggestionScreen() {
           <View style={styles.idiomHeader}>
             {/* 다이아몬드 토글 버튼 ('id' 사용) */}
             <TouchableOpacity
-              onPress={() => handleToggle(idiom.id)}
+              onPress={() => handleToggle(idiom.suggestionId)}
               style={styles.diamondButton}
             >
               <View
@@ -187,7 +176,7 @@ export default function SuggestionScreen() {
           {isExpanded && (
             <View style={styles.expandedContent}>
               {/* 'Meaning' (M 대문자) 사용 */}
-              <Text style={styles.koreanMeaning}>{idiom.Meaning}</Text>
+              <Text style={styles.koreanMeaning}>{idiom.meaning}</Text>
               <Text style={styles.example}>예: {idiom.naturalExample}</Text>
               <Text style={styles.example}>적용: {idiom.appliedSentence}</Text>
               <View style={styles.detailsBox}>

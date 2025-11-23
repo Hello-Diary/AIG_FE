@@ -96,7 +96,7 @@ export default function DiaryScreen() {
       const data: JournalRequest = {
         title,
         content: description,
-        emoji: selectedEmoji || null,
+        emoji: selectedEmoji || "✍️",
         date: date instanceof Date ? date.toISOString().split("T")[0] : date,
         questionId: topicQuestion ? topicQuestion.questionId : null,
       };

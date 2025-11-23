@@ -1,28 +1,27 @@
 // JournalFeedbackScreen.tsx (전체 코드)
 
-import DownArrowIcon from "@/assets/icons/down-arrow.svg";
+import BackButton from "@/src/components/common/BackButton";
+import MoreButton from "@/src/components/common/MoreButton";
 import c from "@/src/constants/colors";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
-  Alert,
-  Dimensions,
-  TextInput,
-  ActivityIndicator, // 로딩 상태 표시를 위해 추가
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BackButton from "@/src/components/common/BackButton";
-import MoreButton from "@/src/components/common/MoreButton";
-import { useRouter, useLocalSearchParams } from "expo-router";
 
 // 💡 API 및 타입 임포트 (경로를 실제 파일 위치에 맞게 수정하세요)
+import { useAuthStore } from "@/src/stores/useUserStore";
 import { patchJournalApi } from "../../../src/api/journalApi"; // <-- 실제 경로로 변경 필요
 import { JournalRequest, JournalResponse } from "../../../src/types/journal";
-import { useAuthStore } from "@/src/stores/useUserStore"; 
 // 💡 [추가] Journal Store에서 갱신 함수 가져오기
 import { useJournalStore } from "../../../src/stores/useJournalStore";
 
@@ -130,7 +129,7 @@ export default function JournalFeedbackScreen() {
       content: editingDescription,
       emoji: editingEmoji,
       // date를 API에 정의된 형식에 맞게 전달해야 합니다. (여기서는 Date 객체 그대로 전달)
-      date: date, 
+      date: date instanceof Date ? date.toISOString().split("T")[0] : date, 
       questionId: fullJournalData?.questionId || null, 
     };
 
@@ -167,6 +166,9 @@ export default function JournalFeedbackScreen() {
     }
   };
 
+  const handleSuggestion = () => {
+    router.push("/suggestion");
+  };
 
   const handleMenuAction = (action: string) => {
     setIsMenuOpen(false); 
@@ -382,7 +384,7 @@ export default function JournalFeedbackScreen() {
         <View style={styles.bottomFixedContainer}>
           <TouchableOpacity
             style={styles.suggestionButton}
-            onPress={() => Alert.alert("알림", "아직 준비중인 기능이에요!")}
+            onPress={handleSuggestion}
           >
             <Text style={styles.suggestionButtonText}>AI 추천 표현 보기</Text>
             <View style={styles.rightArrowIcon}>

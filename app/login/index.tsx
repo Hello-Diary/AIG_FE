@@ -13,11 +13,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// import { postLoginApi } from "../../src/api/authApi";
+import { postLoginApi } from "../../src/api/authApi";
 // LoginResponse 타입은 useAuthStore에서 정의한 UserProfile과 구조가 같아야 합니다.
 import { useAuthStore } from "../../src/stores/useUserStore";
-// import { LoginRequest, LoginResponse } from "../../src/types/auth";
-import { LoginRequest } from "../../src/types/auth";
+import { LoginRequest, LoginResponse } from "../../src/types/auth";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -43,20 +42,16 @@ export default function LoginScreen() {
       console.log(loginData);
 
       // 🚨 postLoginApi 호출 및 응답 획득
-    //   const res: LoginResponse = await postLoginApi(loginData);
+      const res: LoginResponse = await postLoginApi(loginData);
 
-    //   console.log("Login Successful:", res);
+      console.log("Login Successful:", res);
 
-    //   if (!res.userId) {
-    //     throw new Error("서버 응답에 사용자 ID가 포함되어 있지 않습니다.");
-    //   }
+      if (!res.userId) {
+        throw new Error("서버 응답에 사용자 ID가 포함되어 있지 않습니다.");
+      }
 
-    //   // 💡 1. Zustand 스토어 업데이트 (모든 사용자 정보를 저장)
-    //   zustandSignIn(res);
-    zustandSignIn({
-        userId: "e35aee21-8ab2-4d1c-bbac-41c3ac88ddef",
-        name: "tempName",
-      });
+      // 💡 1. Zustand 스토어 업데이트 (모든 사용자 정보를 저장)
+      zustandSignIn(res);
 
       // 💡 2. 리다이렉트 (가장 확실한 해결책)
       router.replace("/(tabs)/home");
