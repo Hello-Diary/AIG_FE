@@ -3,7 +3,7 @@ export interface BatchFlashcard {
   isFlashcard: boolean;
 }
 
-export interface FlashcardRequest {
+export interface BatchFlashcardRequest {
   suggestions: BatchFlashcard[];
 }
 
@@ -14,6 +14,6 @@ export interface FlashcardResponse {
   tags: string[];
   userId: string;
   journalId: string;
-  feedbackId: string;
+  suggestionId: string;
   createdAt: string;
 }

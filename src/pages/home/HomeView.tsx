@@ -1,21 +1,19 @@
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import React, { useState, useEffect, useCallback } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, Alert, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 // Svg Icons
 import CalendarSvg from '@/assets/images/calender.svg';
 import { ChevronLeftIcon, ChevronRightIcon, Plus2Icon, SearchIcon } from '../../components/home/SvgIcons';
 // Components
 import AddDiaryButton from '@/src/components/diary/AddDiaryButton';
-import MiniCalendar from '../../components/home/MiniCalendar';
 import c from '@/src/constants/colors';
+import MiniCalendar from '../../components/home/MiniCalendar';
 
-import { useAuthStore } from "../../stores/useUserStore"; 
-import { useJournalStore } from "../../stores/useJournalStore"; 
-import { getJournalByDateApi, getAllJournalApi } from '../../api/journalApi'; 
-import { JournalResponse } from '../../types/journal'; 
-
-const screenHeight = Dimensions.get('window').height;
+import { getAllJournalApi, getJournalByDateApi } from '../../api/journalApi';
+import { useJournalStore } from "../../stores/useJournalStore";
+import { useAuthStore } from "../../stores/useUserStore";
+import { JournalResponse } from '../../types/journal';
 
 interface PaginationInfo {
   currentPage: number;
@@ -761,23 +759,8 @@ const HomeView: React.FC<HomeViewProps> = ({ koreanDayNames }) => {
       router.push('/diary');
   }
   
-  const handleGoToFeedback = (journal: JournalResponse) => {
-    const journalData = {
-        title: journal.title,
-        content: journal.content,
-        emoji: journal.emoji,
-        date: journal.date,
-        submittedAt: journal.submittedAt,
-        journalId: journal.journalId,
-        selectedDate: selectedDate.toISOString(), 
-    };
-    
-    router.push({
-      pathname: '/(tabs)/home/journal',
-      params: { 
-          journalData: JSON.stringify(journalData) 
-      },
-    });
+  const handleGoToFeedback = () => {
+    router.push('/grammar');
   }
 
 
@@ -841,7 +824,7 @@ const HomeView: React.FC<HomeViewProps> = ({ koreanDayNames }) => {
                       <DiaryEntryItem 
                           key={index} 
                           entry={mapToDiaryEntry(entry)}
-                          onPress={() => handleGoToFeedback(entry)}
+                          onPress={handleGoToFeedback}
                       />
                   ))}
               </View>
@@ -907,7 +890,7 @@ const HomeView: React.FC<HomeViewProps> = ({ koreanDayNames }) => {
                           <DiaryEntryItem 
                               key={index} 
                               entry={mapToDiaryEntry(entry)}
-                              onPress={() => handleGoToFeedback(entry)}
+                              onPress={handleGoToFeedback}
                           />
                       ))}
                   </View>
@@ -919,7 +902,7 @@ const HomeView: React.FC<HomeViewProps> = ({ koreanDayNames }) => {
                           <DiaryEntryItem 
                               key={index + yesterdayEntries.length} 
                               entry={mapToDiaryEntry(entry)} 
-                              onPress={() => handleGoToFeedback(entry)}
+                              onPress={handleGoToFeedback}
                           />
                       ))}
                   </View>

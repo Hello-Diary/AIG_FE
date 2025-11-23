@@ -226,6 +226,7 @@ export default function GrammarFeedbackScreen() {
       // API 응답의 edits 배열과 원본 content를 사용해 UI용 배열 생성
       const segments = processFeedback(originalDiary.content, grammarFeedback.edits);
       setProcessedContent(segments);
+      setSelectedTab("my");
     }
   }, [grammarFeedback, originalDiary]);
 

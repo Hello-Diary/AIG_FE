@@ -3,7 +3,8 @@ import {
   getSavedFlashcardsApi,
 } from "@/src/api/flashcardApi";
 import c from "@/src/constants/colors";
-import { FlashcardResponse, IdiomSuggestion } from "@/src/types/dictionary";
+import { useAuthStore } from "@/src/stores/useUserStore";
+import { FlashcardResponse } from "@/src/types/dictionary";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useIsFocused } from "@react-navigation/native";
 import { JSX, useEffect, useState } from "react";
@@ -17,12 +18,12 @@ import {
 } from "react-native";
 
 export default function Dictionary() {
+  const { userId } = useAuthStore();
   const [suggestions, setSuggestions] = useState<FlashcardResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedIdiom, setSelectedIdiom] = useState<IdiomSuggestion | null>(
+  const [selectedIdiom, setSelectedIdiom] = useState<FlashcardResponse | null>(
     null
   );
-  // 선택된 항목들을 추적하는 state
   const [toggledIdioms, setToggledIdioms] = useState<Record<string, boolean>>(
     {}
   );
@@ -32,9 +33,14 @@ export default function Dictionary() {
   useEffect(() => {
     if (isFocused) {
       const fetchDictionary = async () => {
+        if (!userId) {
+          console.log("userId not found", userId);
+          return;
+        }
+
         setIsLoading(true);
         try {
-          const data = await getSavedFlashcardsApi();
+          const data = await getSavedFlashcardsApi(userId);
 
           setSuggestions(data);
         } catch (error) {
@@ -49,8 +55,8 @@ export default function Dictionary() {
   }, [isFocused]);
 
   // 확장/축소 핸들러 (기존 로직)
-  const handleIdiomPress = (idiom: IdiomSuggestion): void => {
-    if (selectedIdiom?.idiom === idiom.idiom) {
+  const handleIdiomPress = (idiom: FlashcardResponse): void => {
+    if (selectedIdiom?.flashcardId === idiom.flashcardId) {
       setSelectedIdiom(null);
     } else {
       setSelectedIdiom(idiom);
@@ -70,21 +76,23 @@ export default function Dictionary() {
     const itemsToUpdate = Object.keys(toggledIdioms)
       .filter((id) => toggledIdioms[id]) // 토글된 항목만 필터링
       .map((id) => ({
-        suggestionId: id, // 컴포넌트의 flashcardId를 API의 suggestionId로 매핑
+        suggestionId: id,
         isFlashcard: false, // 사전에서 토글 = 제거(false)로 간주
       }));
 
     if (itemsToUpdate.length === 0) return;
 
     try {
-      // 수정된 API 호출
-      const res = await batchToggleFlashcardsApi({ suggestions: itemsToUpdate });
+
+      const res = await batchToggleFlashcardsApi({
+        suggestions: itemsToUpdate,
+      });
 
       // 성공 시
       setSuggestions(res);
       setToggledIdioms({}); // 토글 상태 초기화
     } catch (error) {
-      console.error("Failed to batch update:", error);
+      console.error("Failed to batch update:", error, itemsToUpdate);
     }
   };
 
@@ -92,14 +100,15 @@ export default function Dictionary() {
   const isAnyToggled = Object.values(toggledIdioms).some(Boolean);
 
   const renderIdiomItem = (
-    idiom: IdiomSuggestion,
+    idiom: FlashcardResponse,
     index: number
   ): JSX.Element => {
-    const isExpanded: boolean = selectedIdiom?.idiom === idiom.idiom;
-    const isToggled: boolean = !!toggledIdioms[idiom.id];
+    const isExpanded: boolean =
+      selectedIdiom?.flashcardId === idiom.flashcardId;
+    const isToggled: boolean = !!toggledIdioms[idiom.flashcardId];
 
     return (
-      <View key={`${idiom.idiom}-${index}`}>
+      <View key={`${idiom.flashcardId}-${index}`}>
         <TouchableOpacity
           style={styles.idiomItem}
           onPress={() => handleIdiomPress(idiom)} // 본문 클릭 시 확장
@@ -108,7 +117,7 @@ export default function Dictionary() {
           <View style={styles.idiomHeader}>
             {/* 다이아몬드 토글 버튼 */}
             <TouchableOpacity
-              onPress={() => handleToggleIdiom(idiom.id)}
+              onPress={() => handleToggleIdiom(idiom.suggestionId)}
               style={styles.diamondButton}
             >
               <View
@@ -117,7 +126,7 @@ export default function Dictionary() {
             </TouchableOpacity>
 
             {/* 숙어 텍스트 */}
-            <Text style={styles.idiomText}>{idiom.idiom}</Text>
+            <Text style={styles.idiomText}>{idiom.front}</Text>
 
             {/* 확장 아이콘 */}
             <Ionicons
@@ -128,14 +137,8 @@ export default function Dictionary() {
           </View>
           {isExpanded && (
             <View style={styles.expandedContent}>
-              <Text style={styles.koreanMeaning}>{idiom.Meaning}</Text>
-              <Text style={styles.example}>예: {idiom.naturalExample}</Text>
-              <Text style={styles.example}>적용: {idiom.appliedSentence}</Text>
               <View style={styles.detailsBox}>
-                <Text style={styles.sectionTitle}>맥락 (Context)</Text>
-                <Text style={styles.bulletPoint}>• {idiom.context}</Text>
-                <Text style={styles.sectionTitle}>유래 (Origin)</Text>
-                <Text style={styles.bulletPoint}>• {idiom.origin}</Text>
+                <Text style={styles.back}>{idiom.back}</Text>
               </View>
             </View>
           )}
@@ -167,17 +170,17 @@ export default function Dictionary() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* TODO: suggestion이든 flashcard response이든 타입 맞춰서 넣기 */}
         {suggestions.map((idiom, index) =>
           renderIdiomItem(
             {
-              id: idiom.flashcardId,
-              idiom: idiom.front,
-              Meaning: idiom.back,
-              naturalExample: "",
-              appliedSentence: "",
-              context: "",
-              origin: "",
+              flashcardId: idiom.flashcardId,
+              front: idiom.front,
+              back: idiom.back,
+              tags: idiom.tags,
+              userId: idiom.userId,
+              journalId: idiom.journalId,
+              suggestionId: idiom.suggestionId,
+              createdAt: idiom.createdAt,
             },
             index
           )
@@ -210,7 +213,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     flex: 1,
-    backgroundColor: c.bg || "#fff",
+    backgroundColor: c.bg || c.mainwhite,
   },
   content: {
     flex: 1, // 스크롤 영역이 버튼을 제외한 나머지 공간을 채우도록
@@ -277,7 +280,7 @@ const styles = StyleSheet.create({
   idiomText: {
     flex: 1, // 텍스트가 남은 공간을 채움
     fontSize: 16,
-    color: "#000",
+    color: c.black,
     fontWeight: "400",
   },
   expandedContent: {
@@ -291,18 +294,11 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderTopWidth: 1,
   },
-  koreanMeaning: {
+  back: {
     fontSize: 16,
-    color: "#000",
+    color: c.black,
     marginBottom: 10,
     fontWeight: "500",
-  },
-  example: {
-    fontSize: 14,
-    textAlign: "center",
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    fontStyle: "italic",
   },
   detailsBox: {
     width: "100%",
@@ -310,20 +306,6 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#000",
-    marginBottom: 8,
-    marginTop: 10,
-  },
-  bulletPoint: {
-    fontSize: 13,
-    color: "#666",
-    marginBottom: 4,
-    paddingLeft: 5,
-    lineHeight: 18,
   },
   // --- 버튼 스타일 ---
   buttonContainer: {

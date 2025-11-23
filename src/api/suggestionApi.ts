@@ -3,9 +3,8 @@ import { ENDPOINT } from "./endPoint";
 import { http } from "./http";
 
 // (SuggestionScreen에서 isSuggested가 false일 때 호출)
-// TODO: post llm api 호출해야 함!
-export const getNewSuggestionApi = async (journalId: string) => {
-  const res = await http.get<Suggestion[]>(
+export const postNewSuggestionApi = async (journalId: string) => {
+  const res = await http.post<null, Suggestion[]>(
     `${ENDPOINT.LLM}/${journalId}`
   );
   return res;
