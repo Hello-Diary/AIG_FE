@@ -27,6 +27,7 @@ export default function Dictionary() {
   const [toggledIdioms, setToggledIdioms] = useState<Record<string, boolean>>(
     {}
   );
+  const [isSaving, setIsSaving] = useState(false);
 
   const isFocused = useIsFocused();
 
@@ -73,26 +74,32 @@ export default function Dictionary() {
 
   // Batch 업데이트 핸들러
   const handleUpdateDictionary = async () => {
+    setIsSaving(true);
+
     const itemsToUpdate = Object.keys(toggledIdioms)
       .filter((id) => toggledIdioms[id]) // 토글된 항목만 필터링
       .map((id) => ({
         suggestionId: id,
-        isFlashcard: false, // 사전에서 토글 = 제거(false)로 간주
+        isFlashcard: false,
       }));
 
-    if (itemsToUpdate.length === 0) return;
+    if (itemsToUpdate.length === 0) {
+      alert("저장할 용어 카드를 선택해주세요.");
+      setIsSaving(false);
+      return;
+    }
 
     try {
-
       const res = await batchToggleFlashcardsApi({
         suggestions: itemsToUpdate,
       });
-
-      // 성공 시
       setSuggestions(res);
-      setToggledIdioms({}); // 토글 상태 초기화
+      setToggledIdioms({});
     } catch (error) {
-      console.error("Failed to batch update:", error, itemsToUpdate);
+      console.error("Failed to save flashcards:", error);
+      alert("저장에 실패했습니다.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -105,7 +112,7 @@ export default function Dictionary() {
   ): JSX.Element => {
     const isExpanded: boolean =
       selectedIdiom?.flashcardId === idiom.flashcardId;
-    const isToggled: boolean = !!toggledIdioms[idiom.flashcardId];
+    const isToggled: boolean = !!toggledIdioms[idiom.suggestionId];
 
     return (
       <View key={`${idiom.flashcardId}-${index}`}>
@@ -190,14 +197,14 @@ export default function Dictionary() {
       {/* 하단 버튼 추가 */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.updateButton, !isAnyToggled && styles.disabledButton]}
-          disabled={!isAnyToggled}
+          style={[styles.updateButton, (isSaving || !isAnyToggled) && styles.disabledButton]}
+          disabled={isSaving || !isAnyToggled}
           onPress={handleUpdateDictionary}
         >
           <Text
             style={[
               styles.buttonText,
-              !isAnyToggled && styles.disabledButtonText,
+              (isSaving || !isAnyToggled) && styles.disabledButtonText,
             ]}
           >
             나의 사전 수정하기
