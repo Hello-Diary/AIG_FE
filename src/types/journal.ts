@@ -32,4 +32,21 @@ export interface JournalSuggestionResponse {
   question: Question;
   suggestion: Suggestion[];
   isSuggested: boolean;
+  questionId: string | null;
+}
+
+export interface PaginationInfo {
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+export interface JournalListResponse {
+  journals: JournalResponse[];
+  pagination: PaginationInfo;
 }

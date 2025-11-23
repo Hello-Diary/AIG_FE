@@ -2,13 +2,13 @@ import DownArrowIcon from "@/assets/icons/down-arrow.svg";
 import EmojiIcon from "@/assets/icons/emoji-button.svg";
 import RefreshIcon from "@/assets/icons/refresh.svg";
 import XIcon from "@/assets/icons/x-button.svg";
-
 import c from "@/src/constants/colors";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
+  Alert,
   Animated,
   Button,
   InputAccessoryView,
@@ -22,25 +22,28 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Svg, { Path } from "react-native-svg";
 
 import { postJournalApi } from "@/src/api/journalApi";
 import { getAllQuestionApi } from "@/src/api/questionApi";
+
 import BackButton from "@/src/components/common/BackButton";
 import MoreButton from "@/src/components/common/MoreButton";
 import BottomModal from "@/src/components/diary/BottomModal";
 import DeleteModal from "@/src/components/diary/DeleteModal";
 import RewriteModal from "@/src/components/diary/RewriteModal";
 import SaveModal from "@/src/components/diary/SaveModal";
+
 import { useJournalStore } from "@/src/stores/useJournalStore";
-import { useUserStore } from "@/src/stores/useUserStore";
+import { useAuthStore } from "@/src/stores/useUserStore";
+import { JournalRequest } from "@/src/types/journal";
 import { Question } from "@/src/types/question";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
+
 
 const inputAccessoryViewID = "diaryInputAccessory";
 
 export default function DiaryScreen() {
-  const { userId } = useUserStore();
+  const { userId } = useAuthStore();
   const { diaryDate, setCurrentJournalId } = useJournalStore();
   const [topicQuestion, setTopicQuestion] = useState<Question | null>(null);
 
@@ -49,6 +52,7 @@ export default function DiaryScreen() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -61,15 +65,38 @@ export default function DiaryScreen() {
   const emojiInputRef = useRef<TextInput>(null);
   const slideAnim = useRef(new Animated.Value(280)).current;
 
-  const isButtonEnabled = title.trim() !== "" && description.trim() !== "";
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setTitle("");
+        setDescription("");
+        setSelectedEmoji("");
+        setTopicQuestion(null);
+        console.log("DiaryScreen: Unsaved data cleared upon blurring.");
+      };
+    }, [])
+  );
+
+  const isButtonEnabled =
+    title.trim() !== "" && description.trim() !== "" && !isSubmitting;
 
   const handleSubmit = async () => {
-    if (!isButtonEnabled) return;
+    if (!isButtonEnabled || isSubmitting) return;
+
+    if (!userId) {
+      console.error("User ID is missing. Redirecting to login.");
+      Alert.alert("로그인 필요", "일기를 제출하려면 로그인해야 합니다.");
+      router.replace("/login");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      const data = {
+      const data: JournalRequest = {
         title,
         content: description,
-        emoji: selectedEmoji,
+        emoji: selectedEmoji || null,
         date: date instanceof Date ? date.toISOString().split("T")[0] : date,
         questionId: topicQuestion ? topicQuestion.questionId : null,
       };
@@ -77,32 +104,53 @@ export default function DiaryScreen() {
       const res = await postJournalApi(userId, data);
 
       setCurrentJournalId(res.journalId);
+      router.push("/grammar");
     } catch (error) {
-      console.error("Failed to post journal:", error);
+      console.error("일기 제출 실패:", error);
+      Alert.alert("제출 오류", "일기 제출에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsSubmitting(false);
     }
 
     router.push("/grammar");
   };
 
   const handleEmojiInput = (currentInputText: string) => {
-    if (currentInputText.length < selectedEmoji.length) {
-      setSelectedEmoji("");
-      return;
-    }
-
-    const newEmoji = currentInputText.replace(selectedEmoji, "");
-
-    if (newEmoji) {
+    const newChar = currentInputText.replace(selectedEmoji, "");
+    
+    if (newChar.length > 0) {
+      const newEmoji = newChar; 
+      
       setSelectedEmoji(newEmoji);
+      
       Keyboard.dismiss();
+
+      if (emojiInputRef.current) {
+        setTimeout(() => {
+            emojiInputRef.current?.clear(); 
+        }, 0);
+      }
+      
+    } else if (currentInputText.length < selectedEmoji.length) {
+      setSelectedEmoji("");
     }
   };
 
   const handleDrawTopic = async () => {
-    const res = await getAllQuestionApi();
-    const randomIndex = Math.floor(Math.random() * res.length);
+    try {
+      const question = await getAllQuestionApi();
 
-    setTopicQuestion(res[randomIndex]);
+      if (question && (question as Question).text) {
+        console.log("선택된 주제 카드 Text:", (question as Question).text);
+        setTopicQuestion(question as Question);
+      } else {
+        setTopicQuestion(null);
+        Alert.alert("알림", "가져올 질문이 없습니다.");
+      }
+    } catch (error) {
+      console.error("주제 카드 가져오기 실패:", error);
+      Alert.alert("오류", "주제 카드를 가져오는 중 오류가 발생했습니다.");
+    }
   };
 
   const handleClearTopic = () => {
@@ -110,8 +158,16 @@ export default function DiaryScreen() {
   };
 
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    const currentDate = selectedDate || tempDate;
-    setTempDate(currentDate);
+    if (Platform.OS === "android") {
+        setPickerVisible(false);
+        if (event.type === 'set' && selectedDate) {
+            setDate(selectedDate);
+            setTempDate(selectedDate);
+        }
+    } else {
+        const currentDate = selectedDate || tempDate;
+        setTempDate(currentDate);
+    }
   };
 
   const handleConfirmDate = () => {
@@ -124,7 +180,6 @@ export default function DiaryScreen() {
     setPickerVisible(false);
   };
 
-  // TODO: formatdate method utils로 분리하기
   const formatDate = (d: Date) => {
     const year = d.getFullYear();
     const month = d.getMonth() + 1;
@@ -148,25 +203,22 @@ export default function DiaryScreen() {
   const handleMenuAction = (action: string) => {
     if (action === "delete") {
       setIsDeleteModalVisible(true);
-      toggleMenu();
     } else if (action === "save") {
       setIsSaveModalVisible(true);
-      toggleMenu();
     } else if (action === "rewrite") {
       setIsRewriteModalVisible(true);
-      toggleMenu();
     }
+    toggleMenu();
   };
 
   const handleRewriteConfirm = () => {
-    console.log("Diary deleted");
     setIsRewriteModalVisible(false);
-
-    // 다시 쓰는 로직
     setTitle("");
     setDescription("");
     setDate(new Date());
+    setTempDate(new Date());
     setSelectedEmoji("");
+    setTopicQuestion(null);
   };
 
   const handleRewriteCancel = () => {
@@ -176,12 +228,21 @@ export default function DiaryScreen() {
   const handleSaveConfirm = async () => {
     setIsSaveModalVisible(false);
 
-    // 저장 후 main으로 가는 로직
+    if (title.trim() === "" && description.trim() === "") {
+        router.push("/");
+        return;
+    }
+    if (!userId) {
+      console.error("User ID is missing for saving. Redirecting to login.");
+      router.replace("/login"); 
+      return;
+    }
+
     try {
-      const data = {
+      const data: JournalRequest = {
         title,
         content: description,
-        emoji: selectedEmoji,
+        emoji: selectedEmoji || null,
         date: date instanceof Date ? date.toISOString().split("T")[0] : date,
         questionId: topicQuestion ? topicQuestion.questionId : null,
       };
@@ -189,7 +250,7 @@ export default function DiaryScreen() {
       const res = await postJournalApi(userId, data);
       setCurrentJournalId(res.journalId);
     } catch (error) {
-      console.error("Failed to save journal temporarily:", error);
+      console.error("일기 임시 저장 실패:", error);
     }
 
     router.push("/");
@@ -199,10 +260,8 @@ export default function DiaryScreen() {
     setIsSaveModalVisible(false);
   };
 
-  // 애초에 add diary screen 이라서 삭제할 때 API 호출 필요 없음!
   const handleDeleteConfirm = () => {
     setIsDeleteModalVisible(false);
-
     router.push("/");
   };
 
@@ -211,41 +270,55 @@ export default function DiaryScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={[]}>
-      <BottomModal
-        visible={isPickerVisible}
-        title="날짜 지정"
-        pageType="datePicker"
-        onClose={handleCancelDate}
-      >
-        <View style={styles.modalContent}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      {/* 날짜 선택 모달 */}
+      {Platform.OS === "ios" ? (
+        <BottomModal
+          visible={isPickerVisible}
+          title="날짜 지정"
+          pageType="datePicker"
+          onClose={handleCancelDate}
+        >
+          <View style={styles.modalContent}>
+            <DateTimePicker
+              value={tempDate}
+              mode="date"
+              display="spinner"
+              onChange={onDateChange}
+              locale="ko-KR"
+              textColor={c.black}
+              maximumDate={new Date()}
+            />
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={handleCancelDate}
+              >
+                <Text style={[styles.modalButtonText, styles.cancelButtonText]}>
+                  취소
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.confirmButton]}
+                onPress={handleConfirmDate}
+              >
+                <Text style={styles.modalButtonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </BottomModal>
+      ) : ( 
+        isPickerVisible && (
           <DateTimePicker
-            value={tempDate}
+            value={date}
             mode="date"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
+            display="default"
             onChange={onDateChange}
             locale="ko-KR"
-            textColor={c.black}
             maximumDate={new Date()}
           />
-          <View style={styles.modalButtonContainer}>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.cancelButton]}
-              onPress={handleCancelDate}
-            >
-              <Text style={[styles.modalButtonText, styles.cancelButtonText]}>
-                취소
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.confirmButton]}
-              onPress={handleConfirmDate}
-            >
-              <Text style={styles.modalButtonText}>확인</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </BottomModal>
+        )
+      )}
 
       <RewriteModal
         visible={isRewriteModalVisible}
@@ -351,33 +424,15 @@ export default function DiaryScreen() {
                 onChangeText={setTitle}
                 placeholder="제목없음"
                 placeholderTextColor={c.gray3}
+                editable={!isSubmitting}
               />
-
-              {/* Pencil Icon with no functions */}
-              <TouchableOpacity style={styles.editIcon}>
-                <Svg width="18" height="18" viewBox="0 0 15 16" fill="none">
-                  <Path
-                    d="M7.5 13H13.125"
-                    stroke="#959595"
-                    strokeWidth="1.25"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M10.3125 2.68764C10.5611 2.439 10.8984 2.29932 11.25 2.29932C11.4241 2.29932 11.5965 2.33361 11.7574 2.40024C11.9182 2.46687 12.0644 2.56453 12.1875 2.68764C12.3106 2.81076 12.4083 2.95691 12.4749 3.11777C12.5415 3.27863 12.5758 3.45103 12.5758 3.62514C12.5758 3.79925 12.5415 3.97166 12.4749 4.13251C12.4083 4.29337 12.3106 4.43953 12.1875 4.56264L4.375 12.3751L1.875 13.0001L2.5 10.5001L10.3125 2.68764Z"
-                    stroke="#959595"
-                    strokeWidth="1.25"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-              </TouchableOpacity>
             </View>
 
             {/* Emoji Button */}
             <TouchableOpacity
               style={styles.emojiButton}
               onPress={() => emojiInputRef.current?.focus()}
+              disabled={isSubmitting}
             >
               {selectedEmoji ? (
                 <Text style={styles.emojiText}>{selectedEmoji}</Text>
@@ -397,6 +452,7 @@ export default function DiaryScreen() {
             multiline={true}
             textAlignVertical="top"
             inputAccessoryViewID={inputAccessoryViewID}
+            editable={!isSubmitting}
           />
 
           {Platform.OS === "ios" && (
@@ -417,6 +473,7 @@ export default function DiaryScreen() {
         <TouchableOpacity
           style={styles.infoContainer}
           onPress={handleDrawTopic}
+          disabled={isSubmitting}
         >
           {topicQuestion ? (
             <>
@@ -443,6 +500,7 @@ export default function DiaryScreen() {
             <TouchableOpacity
               style={styles.topicCardCloseButton}
               onPress={handleClearTopic}
+              disabled={isSubmitting}
             >
               <XIcon width={16} height={16} />
             </TouchableOpacity>
@@ -456,17 +514,21 @@ export default function DiaryScreen() {
           style={[
             styles.submitButton,
             isButtonEnabled && styles.submitButtonActive,
+            !isButtonEnabled && styles.submitButtonDisabled,
           ]}
           onPress={handleSubmit}
-          disabled={!isButtonEnabled}
+          disabled={!isButtonEnabled || isSubmitting}
         >
-          <Text style={styles.submitButtonText}>피드백 받기</Text>
+          <Text style={styles.submitButtonText}>
+            {isSubmitting ? "제출 중..." : "피드백 받기"}
+          </Text>
         </TouchableOpacity>
 
         {!isDictionaryVisible && !isPickerVisible && (
           <TouchableOpacity
             style={styles.linkContainer}
             onPress={() => setDictionaryVisible(true)}
+            disabled={isSubmitting}
           >
             <Text style={styles.linkText}>나의 사전 열기</Text>
           </TouchableOpacity>
@@ -486,11 +548,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 50,
     paddingBottom: 20,
   },
 
-  // Menu Styles
   menuOverlay: {
     position: "absolute",
     top: 0,
@@ -505,7 +565,7 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     width: 280,
-    height: "100%",
+    height: "150%",
     backgroundColor: c.mainwhite,
     zIndex: 999,
     shadowColor: "#000",
@@ -538,8 +598,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-
-  // Header
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -555,8 +613,6 @@ const styles = StyleSheet.create({
     color: c.black,
     fontWeight: "500",
   },
-
-  // Card
   card: {
     backgroundColor: c.mainwhite,
     borderRadius: 12,
@@ -583,6 +639,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   titleInput: {
+    flex: 1,
     fontSize: 15,
     color: c.black,
   },
@@ -596,11 +653,9 @@ const styles = StyleSheet.create({
   },
   editIcon: {
     padding: 5,
+    marginLeft: 4, 
   },
   emojiButton: {
-    position: "absolute",
-    top: 0,
-    right: 3,
     width: 32,
     height: 32,
     borderRadius: 6.759,
@@ -636,8 +691,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   alertIconText: { color: c.mainwhite, fontWeight: "bold", fontSize: 12 },
-
-  // Topic Card
   topicCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -658,8 +711,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   topicCardCloseButton: { padding: 4 },
-
-  // Button
   bottomFixedContainer: {
     position: "absolute",
     bottom: 0,
@@ -679,13 +730,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   submitButtonActive: { backgroundColor: c.primary },
+  submitButtonDisabled: { backgroundColor: c.gray3 },
   submitButtonText: { fontSize: 20, fontWeight: "600", color: c.mainwhite },
-
-  // Link
   linkContainer: { alignItems: "center", paddingVertical: 8 },
   linkText: { fontSize: 14, color: c.primary, textDecorationLine: "underline" },
-
-  // Modal
   modalContent: {
     alignItems: "center",
     backgroundColor: "white",

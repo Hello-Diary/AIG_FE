@@ -33,48 +33,6 @@ export interface SelectableSuggestion extends IdiomSuggestion {
   isFlashcard: boolean; // 로컬 UI 상태
 }
 
-// const MOCK_SUGGESTIONS: IdiomSuggestion[] = [
-//   {
-//     id: "sug-id-001",
-//     idiom: "Bite the bullet",
-//     Meaning: "고통스럽거나 어려운 일을 (불평 없이) 참아내다",
-//     naturalExample: "I have to bite the bullet and finish this report tonight.",
-//     appliedSentence: "하기 싫은 발표지만, 'bite the bullet' 하고 준비해야지.",
-//     context: "어쩔 수 없이 해야 하는 힘든 일을 받아들일 때 사용합니다.",
-//     origin:
-//       "과거 전쟁 중 마취제가 없을 때 부상병들이 총알을 물고 고통을 참던 것에서 유래했습니다.",
-//   },
-//   {
-//     id: "sug-id-002",
-//     idiom: "Break the ice",
-//     Meaning: "어색한 분위기를 깨다, 서먹함을 없애다",
-//     naturalExample: "He told a joke to break the ice at the party.",
-//     appliedSentence:
-//       "새로운 팀원들과 'break the ice' 하기 위해 자기소개를 제안했어요.",
-//     context: "처음 만났거나 서먹한 사람들 사이의 긴장을 풀 때 사용합니다.",
-//     origin:
-//       "과거 쇄빙선(Icebreaker)이 얼어붙은 강을 깨고 배의 길을 열어주던 것에서 유래했습니다.",
-//   },
-//   {
-//     id: "sug-id-003",
-//     idiom: "Hit the nail on the head",
-//     Meaning: "정곡을 찌르다, 정확히 알아맞히다",
-//     naturalExample: "You really hit the nail on the head with that analysis.",
-//     appliedSentence: "그녀의 지적은 'hit the nail on the head'였어요.",
-//     context: "어떤 문제의 핵심이나 원인을 정확하게 파악했을 때 사용합니다.",
-//     origin: "망치로 못의 머리(head)를 정확히 때리는 모습에서 유래했습니다.",
-//   },
-//   {
-//     id: "sug-id-004",
-//     idiom: "On the ball",
-//     Meaning: "일을 능숙하게 처리하다, 상황 파악이 빠르다",
-//     naturalExample: "Our new manager is really on the ball.",
-//     appliedSentence: "그녀는 항상 'on the ball' 해서 믿고 맡길 수 있어요.",
-//     context: "업무나 스포츠 등에서 민첩하고 유능한 모습을 묘사할 때 씁니다.",
-//     origin: "스포츠에서 공을 잘 다루는 선수에서 유래했습니다.",
-//   },
-// ];
-
 export default function SuggestionScreen() {
   const router = useRouter();
   const { isSuggested, setIsSuggested } = useSuggestionStore();
