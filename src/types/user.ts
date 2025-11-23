@@ -10,3 +10,12 @@ export interface UserResponse {
   profile: string;
   createdAt: string;
 }
+
+export interface UserSuggestionResponse {
+  userId: string;
+  name: string;
+  password: string;
+  profile: string;
+  createdAt: string;
+  journals: string[];
+}

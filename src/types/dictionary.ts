@@ -1,12 +1,12 @@
-export interface IdiomSuggestion {
-  id: string;
-  idiom: string;
-  Meaning: string; // Note: 'M' is capitalized as in your code
-  naturalExample: string;
-  appliedSentence: string;
-  context: string;
-  origin: string;
-}
+// export interface IdiomSuggestion {
+//   id: string;
+//   idiom: string;
+//   Meaning: string; // Note: 'M' is capitalized as in your code
+//   naturalExample: string;
+//   appliedSentence: string;
+//   context: string;
+//   origin: string;
+// }
 
 export interface BatchFlashcard {
   suggestionId: string;

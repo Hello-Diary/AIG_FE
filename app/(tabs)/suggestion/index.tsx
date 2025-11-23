@@ -8,7 +8,6 @@ import { getNewSuggestionApi, getSuggestionApi } from "@/src/api/suggestionApi";
 // 타입 import
 import {
   FlashcardRequest,
-  IdiomSuggestion, // 'ApiSuggestion' 대신 이 타입을 사용
 } from "@/src/types/dictionary";
 
 // Store import

@@ -6,7 +6,7 @@ import { http } from "./http";
 // TODO: post llm api 호출해야 함!
 export const getNewSuggestionApi = async (journalId: string) => {
   const res = await http.get<SuggestionResponse>(
-    `${ENDPOINT.SUGGESTION}/journal/${journalId}`
+    `${ENDPOINT.LLM}/${journalId}`
   );
   return res;
 };
