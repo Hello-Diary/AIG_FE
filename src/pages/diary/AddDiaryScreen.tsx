@@ -6,9 +6,9 @@ import c from "@/src/constants/colors";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { AxiosError } from "axios";
-import React, { useRef, useState, useEffect, useCallback } from "react"; 
+import React, { useCallback, useRef, useState } from "react";
 import {
+  Alert,
   Animated,
   Button,
   InputAccessoryView,
@@ -20,10 +20,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Svg, { Path } from "react-native-svg";
 
 import { postJournalApi } from "@/src/api/journalApi";
 import { getAllQuestionApi } from "@/src/api/questionApi";
@@ -39,7 +37,7 @@ import { useJournalStore } from "@/src/stores/useJournalStore";
 import { useAuthStore } from "@/src/stores/useUserStore";
 import { JournalRequest } from "@/src/types/journal";
 import { Question } from "@/src/types/question";
-import { useRouter, useFocusEffect } from "expo-router"; 
+import { useFocusEffect, useRouter } from "expo-router";
 
 
 const inputAccessoryViewID = "diaryInputAccessory";
@@ -98,21 +96,23 @@ export default function DiaryScreen() {
       const data: JournalRequest = {
         title,
         content: description,
-        emoji: selectedEmoji || null,
-        date,
+        emoji: selectedEmoji || "✍️",
+        date: date instanceof Date ? date.toISOString().split("T")[0] : date,
         questionId: topicQuestion ? topicQuestion.questionId : null,
       };
 
       const res = await postJournalApi(userId, data);
 
       setCurrentJournalId(res.journalId);
-      router.push("/feedback");
+      router.push("/grammar");
     } catch (error) {
       console.error("일기 제출 실패:", error);
       Alert.alert("제출 오류", "일기 제출에 실패했습니다. 다시 시도해 주세요.");
     } finally {
       setIsSubmitting(false);
     }
+
+    router.push("/grammar");
   };
 
   const handleEmojiInput = (currentInputText: string) => {
@@ -243,7 +243,7 @@ export default function DiaryScreen() {
         title,
         content: description,
         emoji: selectedEmoji || null,
-        date,
+        date: date instanceof Date ? date.toISOString().split("T")[0] : date,
         questionId: topicQuestion ? topicQuestion.questionId : null,
       };
 
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
   },

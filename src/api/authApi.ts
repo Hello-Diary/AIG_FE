@@ -2,7 +2,7 @@ import { LoginRequest, LoginResponse, LogoutRequest, RegisterRequest } from "../
 import { ENDPOINT } from "./endPoint";
 import { http } from "./http";
 
-export const postLoginApi = async (userId: string, data: LoginRequest) => {
+export const postLoginApi = async (data: LoginRequest) => {
     const res = await http.post<LoginRequest, LoginResponse>(`${ENDPOINT.AUTH}/login`, data);
     return res;
 };

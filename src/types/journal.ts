@@ -2,20 +2,20 @@ export interface JournalRequest {
   title: string;
   content: string;
   emoji: string | null;
-  date: Date;
+  date: string;
   questionId: string | null;
 }
 
 export interface JournalResponse {
   journalId: string;
   userId: string;
+  questionId: string;
   title: string;
   content: string;
   emoji: string | null;
-  date: Date;
-  submittedAt: Date;
+  date: string;
+  submittedAt: string;
   isSuggested: boolean;
-  questionId: string | null;
 }
 
 export interface PaginationInfo {

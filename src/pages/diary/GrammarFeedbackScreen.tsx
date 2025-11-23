@@ -7,8 +7,8 @@ import MoveModal from "@/src/components/diary/MoveModal";
 import c from "@/src/constants/colors";
 import { useJournalStore } from "@/src/stores/useJournalStore";
 import { useSuggestionStore } from "@/src/stores/useSuggestionStore";
-import { useUserStore } from "@/src/stores/useUserStore";
-import { Edit, GrammarRequest, GrammarResponse } from "@/src/types/grammar";
+import { useAuthStore } from "@/src/stores/useUserStore";
+import { Edit, GrammarRequest, GrammarResponse, ProcessedSegment } from "@/src/types/grammar";
 import { JournalResponse } from "@/src/types/journal";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -22,16 +22,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// API 응답을 가공하여 렌더링할 UI 조각의 타입
-type ProcessedSegment = {
-  text: string;
-  key: string;
-  wrong?: string;
-  explanation?: string;
-};
-
-export default function FeedbackScreen() {
-  const { userId } = useUserStore();
+export default function GrammarFeedbackScreen() {
+  const { userId } = useAuthStore();
   const { currentJournalId } = useJournalStore();
   const { setIsSuggested } = useSuggestionStore();
 
@@ -42,7 +34,7 @@ export default function FeedbackScreen() {
   const [selectedTab, setSelectedTab] = useState<"my" | "ai">("my");
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [originalDiary, setOriginalDiary] = useState<JournalResponse>({} as JournalResponse);
-  const [feedback, setFeedback] = useState<GrammarResponse>();
+  const [grammarFeedback, setGrammarFeedback] = useState<GrammarResponse>();
   const [processedContent, setProcessedContent] = useState<ProcessedSegment[]>(
     []
   );
@@ -53,6 +45,10 @@ export default function FeedbackScreen() {
   const getOriginalDiary = async () => {
     if (!currentJournalId) {
       console.log("No journal ID found");
+      return;
+    }
+    if (!userId) {
+      console.log("No user ID found");
       return;
     }
 
@@ -78,11 +74,11 @@ export default function FeedbackScreen() {
 
     try {
       const data: GrammarRequest = {
-        text: originalDiary.content,
+        text: originalDiary.content
       };
 
       const res = await postGrammarCheckApi(data);
-      setFeedback(res);
+      setGrammarFeedback(res);
     } catch (error) {
       console.error("Failed to get grammar feedback:", error);
     }
@@ -111,11 +107,21 @@ export default function FeedbackScreen() {
 
       // 2. 교정된 텍스트 추가 (클릭 가능한 부분)
       const originalWord = originalContent.substring(edit.start, edit.end);
+      
+      // 💡 수정된 핵심 로직: errDesc가 null이면 err_cat 정보를 사용해 대체 설명을 생성
+      const effectiveExplanation = edit.err_desc 
+        ? edit.err_desc 
+        : `[${edit.err_cat || '오류'}] '${originalWord}'이(가) 문맥상 올바르지 않아 '${edit.replace}'로 교정되었습니다.`;
+
+      // err_type 필드가 없으므로 err_cat을 사용하여 설명 생성
+      // 마침표 삽입(`INSERT`)의 경우, `wrong`이 빈 문자열이므로, 
+      // 해당 교정은 `explanation`이 존재해도 클릭되지 않게 하려면 렌더링 단에서 `item.wrong` 체크 필요
+
       result.push({
         text: edit.replace, // 교정된 단어
         key: `edit-${edit.start}-${index}`,
-        wrong: originalWord, // 교정 전 단어
-        explanation: edit.errDesc, // 설명
+        wrong: originalWord, // 교정 전 단어 (INSERT의 경우 빈 문자열)
+        explanation: effectiveExplanation, // 설명
       });
 
       // 3. 현재 인덱스를 업데이트
@@ -181,7 +187,7 @@ export default function FeedbackScreen() {
     setIsDeleteModalVisible(false);
 
     try {
-      if (currentJournalId !== "") {
+      if (currentJournalId !== "" && userId) {
         await deleteJournalApi(userId, currentJournalId);
       }
     } catch (error) {
@@ -210,18 +216,19 @@ export default function FeedbackScreen() {
 
   useEffect(() => {
     // originalDiary가 있을 때만 getFeedbackDiary 호출
-    if (originalDiary) {
+    if (originalDiary && originalDiary.content) {
       getFeedbackDiary();
     }
   }, [originalDiary]); // originalDiary가 변경될 때 실행
 
   useEffect(() => {
-    if (feedback && originalDiary) {
+    if (grammarFeedback && originalDiary) {
       // API 응답의 edits 배열과 원본 content를 사용해 UI용 배열 생성
-      const segments = processFeedback(originalDiary.content, feedback.edits);
+      const segments = processFeedback(originalDiary.content, grammarFeedback.edits);
       setProcessedContent(segments);
+      setSelectedTab("my");
     }
-  }, [feedback, originalDiary]);
+  }, [grammarFeedback, originalDiary]);
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
@@ -280,7 +287,7 @@ export default function FeedbackScreen() {
         {/* Header */}
         <View style={styles.header}>
           <HomeButton />
-          <Text style={styles.date}>{formatDate(originalDiary?.date)}</Text>
+          <Text style={styles.date}>{originalDiary?.date}</Text>
           <MoreButton toggleMenu={toggleMenu} />
         </View>
 
@@ -332,7 +339,9 @@ export default function FeedbackScreen() {
             ) : (
               <Text style={styles.content}>
                 {processedContent.map((item) => {
-                  if (item.explanation) {
+                  // explanation이 있고, 'INSERT' (마침표 등)가 아닌 'MODIFY'나 'DELETE' 교정에 대해서만 클릭 가능하게 처리
+                  // 'INSERT' 교정의 경우 item.wrong이 빈 문자열("")
+                  if (item.explanation && item.wrong !== "") {
                     return (
                       <Text
                         key={item.key}

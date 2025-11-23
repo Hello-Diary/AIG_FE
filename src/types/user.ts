@@ -8,5 +8,14 @@ export interface UserResponse {
   email: string;
   name: string;
   profile: string;
-  createdAt: Date;
+  createdAt: string;
+}
+
+export interface UserSuggestionResponse {
+  userId: string;
+  name: string;
+  password: string;
+  profile: string;
+  createdAt: string;
+  journals: string[];
 }

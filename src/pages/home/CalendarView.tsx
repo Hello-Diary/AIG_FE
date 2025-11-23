@@ -1,16 +1,18 @@
 import AddDiaryButton from "@/src/components/diary/AddDiaryButton";
 import {
-    ChevronLeftIcon,
-    ChevronRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "@/src/components/home/SvgIcons";
 import c from "@/src/constants/colors";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import DiaryEntryItem from "../../components/home/DiaryEntryItem";
 
@@ -42,6 +44,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 }) => {
   const days: (number | null)[] = getDaysInMonth(currentDate);
   const selectedDay = 14;
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -52,14 +55,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       >
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.calendarNavHeader}>
-            <TouchableOpacity onPress={() => setCurrentView("home")}>
-              <ChevronLeftIcon />
-            </TouchableOpacity>
-            <Text style={styles.calendarTitle}>Calendar</Text>
-            <View style={styles.placeholder} />
-          </View>
-        </View>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.calendarNavHeader}>캘린더</Text>
+        <View style={{ width: 24 }} />
+      </View>
 
         {/* Calendar Header */}
         <View style={styles.calendarContainer}>
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  calendarTitle: { fontSize: 18, fontWeight: "500", color: c.mainwhite },
+  calendarTitle: { fontSize: 18, fontWeight: "600", color: c.mainwhite },
   placeholder: { width: 24 },
   calendarContainer: { paddingHorizontal: 16, paddingVertical: 16 },
   monthNavigation: {
