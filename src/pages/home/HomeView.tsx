@@ -23,6 +23,7 @@ import AddDiaryButton from "@/src/components/diary/AddDiaryButton";
 import c from "@/src/constants/colors";
 import MiniCalendar from "../../components/home/MiniCalendar";
 
+import { formatDateToString } from "@/src/hooks/FormatDate";
 import { Ionicons } from "@expo/vector-icons";
 import { getAllJournalApi, getJournalByDateApi } from "../../api/journalApi";
 import { useJournalStore } from "../../stores/useJournalStore";
@@ -46,11 +47,6 @@ interface JournalListResponse {
 }
 
 interface DiaryEntry extends JournalResponse {}
-
-interface GrammarSuggestion {
-  text: string;
-  icon: string;
-}
 
 type HomeViewScreen =
   | "home"
@@ -79,17 +75,7 @@ const truncateContent = (content: string): string => {
   return content;
 };
 
-const formatDateToString = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}.${month}.${day}`;
-  } catch (e) {
-    return "날짜 오류";
-  }
-};
+
 
 const DiaryEntryItem: React.FC<DiaryEntryItemProps> = ({
   entry,
@@ -107,7 +93,7 @@ const DiaryEntryItem: React.FC<DiaryEntryItemProps> = ({
   >
     <View style={itemStyles.entryContent}>
       <View style={itemStyles.titleAndEmojiWrapper}>
-        <Text style={itemStyles.entryEmoji}>{entry.emoji || "✍️"}</Text>
+        <Text style={itemStyles.entryEmoji}>{entry.emoji}</Text>
         <Text style={itemStyles.entryTitle}>{entry.title}</Text>
 
         {isJournalListItem && (

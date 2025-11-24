@@ -302,10 +302,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   back: {
-    fontSize: 16,
+    fontSize: 13,
     color: c.black,
     marginBottom: 10,
-    fontWeight: "500",
   },
   detailsBox: {
     width: "100%",

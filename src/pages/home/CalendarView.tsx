@@ -34,7 +34,6 @@ interface CalendarViewProps {
 }
 
 const CalendarView: React.FC<CalendarViewProps> = ({
-  setCurrentView,
   currentDate,
   navigateMonth,
   getDaysInMonth,
