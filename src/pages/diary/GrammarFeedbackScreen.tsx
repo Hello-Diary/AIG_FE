@@ -140,20 +140,6 @@ export default function GrammarFeedbackScreen() {
     return result;
   };
 
-  const formatDate = (d: Date | undefined) => {
-    if (!d) {
-      return "날짜 없음";
-    }
-
-    const year = d.getFullYear();
-    const month = d.getMonth() + 1;
-    const day = d.getDate();
-    return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(
-      2,
-      "0"
-    )}`;
-  };
-
   const toggleMenu = () => {
     const toValue = isMenuOpen ? 280 : 0;
     Animated.timing(slideAnim, {
