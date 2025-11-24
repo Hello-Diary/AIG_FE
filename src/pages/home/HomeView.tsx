@@ -1,24 +1,25 @@
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import React, { useState, useEffect, useCallback } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ActivityIndicator, Alert, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // Svg Icons
 import CalendarSvg from '@/assets/images/calender.svg';
 import { ChevronLeftIcon, ChevronRightIcon, Plus2Icon, SearchIcon } from '../../components/home/SvgIcons';
 // Components
 import AddDiaryButton from '@/src/components/diary/AddDiaryButton';
-import MiniCalendar from '../../components/home/MiniCalendar';
 import c from '@/src/constants/colors';
+import MiniCalendar from '../../components/home/MiniCalendar';
 
-import { useAuthStore } from "../../stores/useUserStore"; 
-import { useJournalStore } from "../../stores/useJournalStore"; 
-import { getJournalByDateApi, getAllJournalApi } from '../../api/journalApi'; 
-import { JournalResponse } from '../../types/journal'; 
+import { formatDateToString } from "@/src/hooks/FormatDate";
+import { getAllJournalApi, getJournalByDateApi } from '../../api/journalApi';
+import { useJournalStore } from "../../stores/useJournalStore";
+import { useAuthStore } from "../../stores/useUserStore";
+import { JournalResponse } from '../../types/journal';
 
 // ⭐️ GrammarFeedbackView 임포트 (경로 수정 필요) ⭐️
-import GrammarFeedbackViewOriginal from '../../../src/pages/diary/GrammarFeedbackScreen'; 
-import { Ionicons } from "@expo/vector-icons";
+import BackButton from '@/src/components/common/BackButton';
+import GrammarFeedbackViewOriginal from '../../../src/pages/diary/GrammarFeedbackScreen';
 
 // ⭐️ 화면 높이 가져오기 ⭐️
 const screenHeight = Dimensions.get('window').height;
@@ -44,11 +45,6 @@ interface JournalListResponse {
 interface DiaryEntry extends JournalResponse {
 }
 
-interface GrammarSuggestion {
-    text: string;
-    icon: string;
-}
-
 // 뷰 타입 정의
 type HomeViewScreen = 'home' | 'calendar' | 'search' | 'comingSoon' | 'journalList' | 'grammar';
 
@@ -57,7 +53,7 @@ interface HomeViewProps {
   koreanDayNames: string[]; 
 }
 interface DiaryEntryItemProps {
-  entry: DiaryEntry;
+  entry: JournalResponse;
   isSearchItem?: boolean;
   isJournalListItem?: boolean; 
   onPress: () => void;
@@ -81,20 +77,6 @@ const truncateContent = (content: string): string => {
     }
     return content;
 };
-
-// ⭐️ 날짜 포맷 헬퍼 함수 ⭐️
-const formatDateToString = (dateString: string): string => {
-    try {
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}.${month}.${day}`;
-    } catch (e) {
-        return '날짜 오류';
-    }
-};
-
 
 const DiaryEntryItem: React.FC<DiaryEntryItemProps> = ({ entry, isSearchItem = false, isJournalListItem = false, onPress }) => (
   <TouchableOpacity 
@@ -566,9 +548,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({
     return (
         <View style={listStyles.container}>
             <View style={listStyles.header}>
-                <TouchableOpacity onPress={() => setCurrentScreen('home')} style={{ padding: 4 }}>
-                    <ChevronLeftIcon />
-                </TouchableOpacity>
+                <BackButton />
                 <Text style={listStyles.headerTitle}>나의 일기 목록</Text>
                 <View style={{ width: 24 }} /> 
             </View>
