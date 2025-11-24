@@ -46,8 +46,6 @@ interface JournalListResponse {
   pagination: PaginationInfo;
 }
 
-interface DiaryEntry extends JournalResponse {}
-
 type HomeViewScreen =
   | "home"
   | "calendar"
@@ -60,7 +58,7 @@ interface HomeViewProps {
   koreanDayNames: string[];
 }
 interface DiaryEntryItemProps {
-  entry: DiaryEntry;
+  entry: JournalResponse;
   isSearchItem?: boolean;
   isJournalListItem?: boolean;
   onPress: () => void;
@@ -74,8 +72,6 @@ const truncateContent = (content: string): string => {
   }
   return content;
 };
-
-
 
 const DiaryEntryItem: React.FC<DiaryEntryItemProps> = ({
   entry,
@@ -236,10 +232,6 @@ const isThisWeekExcludingYesterday = (journalDate: Date): boolean => {
   }
   return false;
 };
-
-const mapToDiaryEntry = (journal: JournalResponse): DiaryEntry => ({
-  ...journal,
-});
 
 const useCalendarLogic = (initialDate: Date) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
@@ -625,7 +617,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({
               <DiaryEntryItem
                 key={entry.journalId}
                 isJournalListItem={true}
-                entry={entry as DiaryEntry}
+                entry={entry}
                 onPress={() => handleGoToFeedback(entry)}
               />
             ))}
@@ -898,7 +890,7 @@ const HomeView: React.FC<HomeViewProps> = ({ koreanDayNames }) => {
           {selectedDateEntries.map((entry, index) => (
             <DiaryEntryItem
               key={index}
-              entry={mapToDiaryEntry(entry)}
+              entry={entry}
               onPress={handleGoToFeedback}
             />
           ))}
@@ -979,7 +971,7 @@ const HomeView: React.FC<HomeViewProps> = ({ koreanDayNames }) => {
             {yesterdayEntries.map((entry, index) => (
               <DiaryEntryItem
                 key={index}
-                entry={mapToDiaryEntry(entry)}
+                entry={entry}
                 onPress={handleGoToFeedback}
               />
             ))}
@@ -991,7 +983,7 @@ const HomeView: React.FC<HomeViewProps> = ({ koreanDayNames }) => {
             {thisWeekEntries.map((entry, index) => (
               <DiaryEntryItem
                 key={index + yesterdayEntries.length}
-                entry={mapToDiaryEntry(entry)}
+                entry={entry}
                 onPress={handleGoToFeedback}
               />
             ))}

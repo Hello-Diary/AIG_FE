@@ -1,10 +1,10 @@
+import BackButton from "@/src/components/common/BackButton";
 import AddDiaryButton from "@/src/components/diary/AddDiaryButton";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@/src/components/home/SvgIcons";
 import c from "@/src/constants/colors";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -54,9 +54,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       >
         {/* Header */}
         <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
-        </TouchableOpacity>
+        <BackButton />
         <Text style={styles.calendarNavHeader}>캘린더</Text>
         <View style={{ width: 24 }} />
       </View>
