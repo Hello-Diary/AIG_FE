@@ -5,7 +5,7 @@ import { Pressable } from "react-native";
 
 export default function HomeButton() {
   return (
-    <Pressable onPress={() => router.push("/(tabs)")}>
+    <Pressable onPress={() => router.push("/")}>
       <Ionicons
         name="home-outline"
         style={{ padding: 8 }}

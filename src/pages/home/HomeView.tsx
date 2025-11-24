@@ -227,6 +227,7 @@ const mapToDiaryEntry = (journal: JournalResponse): DiaryEntry => ({
     ...journal,
 });
 
+
 const useCalendarLogic = (initialDate: Date) => {
     const [currentDate, setCurrentDate] = useState(initialDate);
     const [selectedDate, setSelectedDate] = useState(initialDate);
