@@ -18,6 +18,7 @@ import { useAuthStore } from "../../stores/useUserStore";
 import { JournalResponse } from '../../types/journal';
 
 // ⭐️ GrammarFeedbackView 임포트 (경로 수정 필요) ⭐️
+import BackButton from '@/src/components/common/BackButton';
 import GrammarFeedbackViewOriginal from '../../../src/pages/diary/GrammarFeedbackScreen';
 
 // ⭐️ 화면 높이 가져오기 ⭐️
@@ -547,9 +548,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({
     return (
         <View style={listStyles.container}>
             <View style={listStyles.header}>
-                <TouchableOpacity onPress={() => setCurrentScreen('home')} style={{ padding: 4 }}>
-                    <ChevronLeftIcon />
-                </TouchableOpacity>
+                <BackButton />
                 <Text style={listStyles.headerTitle}>나의 일기 목록</Text>
                 <View style={{ width: 24 }} /> 
             </View>

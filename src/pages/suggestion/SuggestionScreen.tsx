@@ -252,7 +252,7 @@ export default function SuggestionScreen() {
             (isSaving || !isAnyToggledForSave) && screenStyles.addButtonDisabled
           ]}
           onPress={handleAddDictionary}
-          disabled={isSaving || !isAnyToggledForSave}
+          disabled={!isAnyToggledForSave}
         >
           {isSaving ? (
             <ActivityIndicator color={c.primary} />
@@ -385,12 +385,12 @@ const suggestionStyles = StyleSheet.create({
   diamond: {
     width: 12,
     height: 12,
-    backgroundColor: c.primary,
+    backgroundColor: c.button,
     transform: [{ rotate: "45deg" }],
     marginRight: 15,
   },
   diamondToggled: {
-    backgroundColor: c.button,
+    backgroundColor: c.primary,
   },
   idiomText: {
     flex: 1,
