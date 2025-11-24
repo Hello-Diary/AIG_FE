@@ -17,7 +17,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -49,7 +49,7 @@ function SuggestionList({
     const isExpanded: boolean =
       selectedIdiom?.suggestionId === idiom.suggestionId;
     // isFlashcard는 상위 컴포넌트의 suggestions 상태에서 관리됩니다.
-    const isToggled: boolean = idiom.isFlashcard;
+    const isToggled: boolean = idiom.isFlashcard; 
 
     return (
       <View key={`${idiom.suggestionId}-${index}`}>
@@ -94,9 +94,7 @@ function SuggestionList({
                 적용: {idiom.appliedSentence}
               </Text>
               <View style={suggestionStyles.detailsBox}>
-                <Text style={suggestionStyles.sectionTitle}>
-                  맥락 (Context)
-                </Text>
+                <Text style={suggestionStyles.sectionTitle}>맥락 (Context)</Text>
                 <Text style={suggestionStyles.bulletPoint}>
                   • {idiom.context}
                 </Text>
@@ -137,7 +135,7 @@ function SuggestionList({
       showsVerticalScrollIndicator={false}
     >
       {suggestions.map((idiom, index) => renderIdiomItem(idiom, index))}
-      <View style={{ height: 100 }} /> {/* 하단 버튼 공간 확보 */}
+      <View style={{ height: 100 }} />
     </ScrollView>
   );
 }
@@ -176,9 +174,10 @@ export default function SuggestionScreen() {
           apiData = await postNewSuggestionApi(currentJournalId);
           setIsSuggested(true);
         }
-
+        
         // API 응답을 기반으로 isFlashcard 상태를 초기화
         setSuggestions(apiData);
+
       } catch (error) {
         console.error("Failed to load suggestions:", error);
       } finally {
@@ -209,13 +208,13 @@ export default function SuggestionScreen() {
       .filter((s) => s.isFlashcard)
       .map((s) => ({
         suggestionId: s.suggestionId,
-        isFlashcard: true,
+        isFlashcard: true, // 사전에 추가(true)
       }));
-
+      
     if (itemsToToggle.length === 0) {
-      alert("저장할 표현을 선택해주세요.");
-      setIsSaving(false);
-      return;
+        alert("저장할 표현을 선택해주세요.");
+        setIsSaving(false);
+        return;
     }
 
     try {
@@ -228,9 +227,9 @@ export default function SuggestionScreen() {
       setIsSaving(false);
     }
   };
-
+  
   // 저장할 항목이 하나라도 있는지 확인
-  const isAnyToggledForSave = suggestions.some((s) => s.isFlashcard);
+  const isAnyToggledForSave = suggestions.some(s => s.isFlashcard);
 
   return (
     <SafeAreaView style={screenStyles.container}>
@@ -249,32 +248,17 @@ export default function SuggestionScreen() {
       <View style={screenStyles.bottomFixedContainer}>
         <TouchableOpacity
           style={[
-            screenStyles.addButton,
-            (isSaving || !isAnyToggledForSave) &&
-              screenStyles.addButtonDisabled,
+            screenStyles.addButton, 
+            (isSaving || !isAnyToggledForSave) && screenStyles.addButtonDisabled
           ]}
           onPress={handleAddDictionary}
-          disabled={isSaving || !isAnyToggledForSave}
+          disabled={!isAnyToggledForSave}
         >
           {isSaving ? (
             <ActivityIndicator color={c.primary} />
           ) : (
-            <View
-              style={[
-                screenStyles.footerButtonUnderline,
-                (isSaving || !isAnyToggledForSave) &&
-                  screenStyles.buttonUnderlineDisabled,
-              ]}
-            >
-              <Text
-                style={[
-                  screenStyles.footerButtonText,
-                  (isSaving || !isAnyToggledForSave) &&
-                    screenStyles.buttonTextDisabled,
-                ]}
-              >
-                나의 사전에 저장
-              </Text>
+            <View style={screenStyles.footerButtonUnderline}>
+              <Text style={screenStyles.footerButtonText}>나의 사전에 저장</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -333,7 +317,8 @@ const screenStyles = StyleSheet.create({
     borderBottomColor: c.primary,
   },
   buttonUnderlineDisabled: {
-    borderBottomColor: c.gray2,
+    borderBottomWidth: 1,
+    borderBottomColor: c.button,
   },
   footerButtonText: {
     color: c.primary,
@@ -341,8 +326,8 @@ const screenStyles = StyleSheet.create({
     fontWeight: "500",
   },
   buttonTextDisabled: {
-    color: c.gray2,
-  },
+    color: c.button,
+  }
 });
 
 const suggestionStyles = StyleSheet.create({
@@ -400,12 +385,12 @@ const suggestionStyles = StyleSheet.create({
   diamond: {
     width: 12,
     height: 12,
-    backgroundColor: c.primary,
+    backgroundColor: c.button,
     transform: [{ rotate: "45deg" }],
     marginRight: 15,
   },
   diamondToggled: {
-    backgroundColor: c.button,
+    backgroundColor: c.primary,
   },
   idiomText: {
     flex: 1,

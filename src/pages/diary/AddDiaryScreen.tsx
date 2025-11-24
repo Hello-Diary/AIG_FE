@@ -33,6 +33,7 @@ import DeleteModal from "@/src/components/diary/DeleteModal";
 import RewriteModal from "@/src/components/diary/RewriteModal";
 import SaveModal from "@/src/components/diary/SaveModal";
 
+import { formatDate } from "@/src/hooks/FormatDate";
 import { useJournalStore } from "@/src/stores/useJournalStore";
 import { useAuthStore } from "@/src/stores/useUserStore";
 import { JournalRequest } from "@/src/types/journal";
@@ -178,16 +179,6 @@ export default function DiaryScreen() {
   const handleCancelDate = () => {
     setTempDate(date);
     setPickerVisible(false);
-  };
-
-  const formatDate = (d: Date) => {
-    const year = d.getFullYear();
-    const month = d.getMonth() + 1;
-    const day = d.getDate();
-    return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(
-      2,
-      "0"
-    )}`;
   };
 
   const toggleMenu = () => {
